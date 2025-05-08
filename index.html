@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Test</title>
   <style>
+    .selected { background-color: #d0eaff !important; border-color: #3399ff; }
     body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
     .question { font-weight: bold; margin-bottom: 10px; }
     .options button {
@@ -36,10 +37,10 @@
 </div>
 
 <div id="navigasyon">
-  <label for="question-sec">soruyu Seç:</label>
+  <label for="soru-sec">Soruyu Seç:</label>
   <select id="question-sec"></select>
-  <button onclick="cevapla()">cevapla</button>
-  <button onclick="sonrakiquestion()">sonraki soru</button>
+  <button onclick="Cevapla()">Cevapla</button>
+  <button onclick="sonrakiquestion()">Sonraki Soru</button>
   <button onclick="testiBitir()">Testi Bitir</button>
 </div>
 
@@ -49,8 +50,49 @@
 </div>
 
 <script>
+
+function gosterSoru() {
+  const s = questionlar[aktifSoru];
+  document.getElementById("soru-metin").innerText = `Soru ${aktifSoru + 1}: ${s.question}`;
+  const seceneklerDiv = document.getElementById("secenekler");
+  seceneklerDiv.innerHTML = "";
+
+  s.options.forEach((secenek, i) => {
+    const btn = document.createElement("button");
+    btn.innerText = secenek;
+    btn.onclick = () => cevapSec(i);
+    btn.setAttribute("data-index", i);
+    seceneklerDiv.appendChild(btn);
+  });
+
+  document.getElementById("soru-sec").value = aktifSoru;
+  document.getElementById("geri-bildirim").innerText = "";
+  document.getElementById("aciklama").innerText = "";
+}
+
+function cevapSec(index) {
+  if (kullaniciCevaplar[aktifSoru] !== null) return;
+  kullaniciCevaplar[aktifSoru] = index;
+
+  const dogruMu = index === questionlar[aktifSoru].answer;
+  const geri = document.getElementById("geri-bildirim");
+  geri.innerText = dogruMu ? "✅ Doğru!" : `❌ Yanlış! Doğru Cevap: ${questionlar[aktifSoru].options[questionlar[aktifSoru].answer]}`;
+  if (dogruMu) puan++;
+
+  const explanation = questionlar[aktifSoru].explanation;
+  document.getElementById("aciklama").innerText = explanation ? `Açıklama: ${explanation}` : "";
+
+  const buttons = document.querySelectorAll(".secenekler button");
+  buttons.forEach((btn, i) => {
+    btn.classList.remove("selected");
+    if (parseInt(btn.getAttribute("data-index")) === index) {
+      btn.classList.add("selected");
+    }
+  });
+}
+
 const questionlar = [
-  {
+{
     "question": "1. Aşağıdakilerden hangisi Aydınlanma döneminin diğer adıdır?",
     "options": [
       "Akıl Çağı",
@@ -75,37 +117,51 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "3. Aşağıdakilerden hangisi Aydınlanma düşüncesini niteleyen özelliklerden biri değildir? a) Totaliterlik***",
+    "question": "3. Aşağıdakilerden hangisi Aydınlanma düşüncesini niteleyen özelliklerden biri değildir? ",
     "options": [
+      "Totaliterlik",
       "Eleştirel rasyonalizm (eleştirel akılcılık)",
       "Sekülarizm",
       "İlerlemecilik",
-      "Dogmatizm karşıtlığı",
-      "Ekonomi"
+      "Dogmatizm karşıtlığı"
     ],
-    "answer": null,
+    "answer": 0,
     "explanation": ""
   },
   {
-    "question": "5. Aşağıdakilerden hangisi Aydınlanma'dan sonra ortaya çıkmış disiplinlerden biri değildir? a) Tarih",
+    "question": "5. Aşağıdakilerden hangisi Aydınlanma'dan sonra ortaya çıkmış disiplinlerden biri değildir?",
     "options": [
+      "Tarih",
       "Estetik",
       "Psikoloji",
       "Antropoloji",
-      "Retorik",
-      "Hutcheson,"
+      "Retorik"
     ],
-    "answer": 3,
+    "answer": 4,
     "explanation": ""
   },
   {
-    "question": "7. Aşağıdakilerden hangisi İskoç Aydınlanmasının temsilcilerinden biri değildir?  a) Hutcheson",
+    "question": "6- Aşağıdakilerden hangisi İskoç aydınlanma filozoflarından biri değildir? ",
+    "options": [
+      "Russell",
+      "Hutcheson, ",
+      "Locke",
+      "Hume",
+      "Adam Smith"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+  },
+  {
+    "question": "7. Aşağıdakilerden hangisi İskoç Aydınlanmasının temsilcilerinden biri değildir? ",
     "options": [
       "Leibniz",
       "Adam Smith",
       "Locke",
       "Hume",
-      "Mendelsohn"
+      "Hutcheson"
     ],
     "answer": 0,
     "explanation": ""
@@ -123,25 +179,25 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "10. Aşağıdaki filozoflardan hangisi ilk olarak Dünya’yı evrenin merkezi olmaktan çıkarır?  a) Kopernikus ***",
+    "question": "10. Aşağıdaki filozoflardan hangisi ilk olarak Dünya’yı evrenin merkezi olmaktan çıkarır?",
     "options": [
       "Thales",
       "Brahe",
       "Galileo",
       "Newton",
-      "Galileo"
+      "Kopernikus"
     ],
     "answer": 4,
     "explanation": ""
   },
   {
-    "question": "12. Aşağıdakilerden hangisi modern bilimin temsilcilerinden biri değildir?  a) Einstein ***",
+    "question": "12. Aşağıdakilerden hangisi modern bilimin temsilcilerinden biri değildir?",
     "options": [
       "Brahe",
       "Galileo",
       "Newton",
       "Kopernikus",
-      "Aristoteles"
+      "Einstein"
     ],
     "answer": 4,
     "explanation": ""
@@ -207,25 +263,25 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "1. Aşağıdakilerden hangisi Fransız aydınlanmasının özelliklerinden biri değildir?  a) Barış yanlısı olma ***",
+    "question": "1. Aşağıdakilerden hangisi Fransız aydınlanmasının özelliklerinden biri değildir?",
     "options": [
       "Sertlik",
       "Radikalizm",
       "Evrenselliğe vurgu",
       "Eşitlik",
-      "Yıkıcı eleştiriyi savunma"
+      "Barış yanlısı olma"
     ],
-    "answer": null,
+    "answer": 4,
     "explanation": ""
   },
   {
-    "question": "3. Aşağıdakilerden hangisi Fransız aydınlanma filozoflarından biri değildir? a) Diderot",
+    "question": "3. Aşağıdakilerden hangisi Fransız aydınlanma filozoflarından biri değildir? ",
     "options": [
       "Voltaire",
       "Descartes",
       "D’Alembert",
       "Bacon",
-      "Bilinmezcidir."
+      "Diderot."
     ],
     "answer": 3,
     "explanation": ""
@@ -303,43 +359,43 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "12. Aşağıdakilerden hangisi 18. yüzyıl Fransız filozoflarına takılan addır?  a) Atomcular",
+    "question": "12. Aşağıdakilerden hangisi 18. yüzyıl Fransız filozoflarına takılan addır?   ",
     "options": [
       "Philosophes",
       "Deistler",
       "Mekanistler",
       "Stoacılar",
-      "İlerlemeci bir dünya görüşü"
+      "Atomcular"
     ],
     "answer": 0,
     "explanation": ""
   },
   {
-    "question": "14. Aşağıdakilerden hangisi Fransız aydınlanmasının öncü filozofudur? a) Holbach",
+    "question": "14. Aşağıdakilerden hangisi Fransız aydınlanmasının öncü filozofudur? ",
     "options": [
       "Diderot",
       "Lamettrie",
       "Voltaire",
       "Condillac",
-      "Çalışanları"
+      "Holbach"
     ],
     "answer": 2,
     "explanation": ""
   },
   {
-    "question": "16. Aşağıdaki filozoflardan hangisi görüşleriyle Fransız Devrimi üzerinde etkili olmuştur? a) Descartes",
+    "question": "16. Aşağıdaki filozoflardan hangisi görüşleriyle Fransız Devrimi üzerinde etkili olmuştur?  ",
     "options": [
       "Voltaire",
       "Locke",
       "Holbach",
       "Spinoza",
-      "Diderot"
+      "Descartes"
     ],
     "answer": 0,
     "explanation": ""
   },
   {
-    "question": "18. Aşağıdaki filozoflardan hangisi evreni tek bir maddi töz olarak görür? a) Diderot",
+    "question": "18. Aşağıdaki filozoflardan hangisi evreni tek bir maddi töz olarak görür? ",
     "options": [
       "Lamettrie",
       "D’Holbach",
@@ -347,7 +403,7 @@ const questionlar = [
       "Voltaire",
       "Diderot"
     ],
-    "answer": 4,
+    "answer": 1,
     "explanation": ""
   },
   {
@@ -363,13 +419,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "21. Aşağıdaki filozoflardan hangisi evreni kendi kendine işleyen bir makine olarak görür? a) D’Alembert",
+    "question": "21. Aşağıdaki filozoflardan hangisi evreni kendi kendine işleyen bir makine olarak görür?  ",
     "options": [
       "Lmettrie",
       "D’Hobach",
       "Diderot",
       "Voltaire",
-      "Locke"
+      "D’Alembert"
     ],
     "answer": 2,
     "explanation": ""
@@ -459,15 +515,15 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "8. Aşağıdakilerden hangisi Kant açısından deneyle hiçbir biçimde ilişkili değildir? a) İmgesel bilgi",
+    "question": "8. Aşağıdakilerden hangisi Kant açısından deneyle hiçbir biçimde ilişkili değildir? a) ",
     "options": [
       "Olağan bilgi",
       "A priori bilgi",
       "A posteriori bilgi",
       "Saf bilgi",
-      "Gemüt"
+      "İmgesel bilgi"
     ],
-    "answer": 4,
+    "answer": 3,
     "explanation": ""
   },
   {
@@ -507,7 +563,7 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "13. Aşağıdakilerden hangisi Kant açısından tüm insan bilgisinin başlangıcında yer alır? a) İdea",
+    "question": "13. Aşağıdakilerden hangisi Kant açısından tüm insan bilgisinin başlangıcında yer alır? ",
     "options": [
       "Kavram",
       "Görü",
@@ -519,51 +575,51 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "15. Aşağıdakilerden hangisi Kant açısından görünün bir formudur? a) Uzay ***",
+    "question": "15. Aşağıdakilerden hangisi Kant açısından görünün bir formudur? ",
     "options": [
       "Nitelik",
       "Birlik",
       "Durum",
       "Nicelik",
-      "Uzay ve zaman"
+      "Uzay"
     ],
     "answer": 4,
     "explanation": ""
   },
   {
-    "question": "17. Aşağıdakilerden hangisi Kant açısından tasarımları sentezleyen yetilerden biridir?  a) Duyarlık",
+    "question": "17. Aşağıdakilerden hangisi Kant açısından tasarımları sentezleyen yetilerden biridir?  ",
     "options": [
       "Akıl",
       "Nous",
       "Phren",
       "Anlama yetisi",
-      "Kendisinde taşıdığı mantıksal işlevler ve kategoriler aracılığıyla"
+      "Duyarlık"
     ],
-    "answer": 4,
+    "answer": 3,
     "explanation": ""
   },
   {
-    "question": "19. Kant’a göre aşağıdaki yetilerden hangisi mantıksal işlevleri yoluyla tasarımları düzenler? a) Duyarlık",
+    "question": "19. Kant’a göre aşağıdaki yetilerden hangisi mantıksal işlevleri yoluyla tasarımları düzenler?  ",
     "options": [
       "Anlama",
       "Akıl",
       "İmgelem",
       "Tasarlama",
-      "Anlama"
+      "Duyarlık"
     ],
     "answer": 0,
     "explanation": ""
   },
   {
-    "question": "21. Kant’a göre aşağıdaki yetilerden hangisi çıkarım ve kıyas yapmayı sağlar? a) Duyarlılık",
+    "question": "21. Kant’a göre aşağıdaki yetilerden hangisi çıkarım ve kıyas yapmayı sağlar? ",
     "options": [
       "Anlama",
       "Akıl",
       "İmgelem",
       "Tasarlama",
-      "Çıkarım ve kıyas yapmayı sağlayan yetidir."
+      "Duyarlılık"
     ],
-    "answer": 4,
+    "answer": 1,
     "explanation": ""
   },
   {
@@ -579,27 +635,27 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "25. Kant bilgi questionnunu ele alırken tartışmayı ne üzerinden yürütür? a) Deneyim",
+    "question": "25. Kant bilgi sorununu ele alırken tartışmayı ne üzerinden yürütür?  ",
     "options": [
       "Akıl",
       "Yargı",
       "Görü",
       "Duyarlık",
-      "Akıl"
+      "Deneyim"
     ],
     "answer": 1,
     "explanation": ""
   },
   {
-    "question": "27. Aşağıdakilerden hangisi Kant’ın yargılara ilişkin yaptığı bölümlemelerden biri değildir? a) A priori yargı",
+    "question": "27. Aşağıdakilerden hangisi Kant’ın yargılara ilişkin yaptığı bölümlemelerden biri değildir? ",
     "options": [
       "A posteriori yargı",
       "Analitik a posteriori yargı",
       "Analitik yargı",
       "Sentetik yargı",
-      "A priori"
+      "A priori yargı"
     ],
-    "answer": 4,
+    "answer": 1,
     "explanation": ""
   },
   {
@@ -615,13 +671,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "30. Aşağıdakilerden hangisi Kant açısından analitik yargının bir özelliği değildir?  a) Zorunlu olmak",
+    "question": "30. Aşağıdakilerden hangisi Kant açısından analitik yargının bir özelliği değildir?  ",
     "options": [
       "Çelişmezlik ilkesine dayanmak",
       "Yeni bilgi vermek",
       "A priori olmak",
       "Yargının yükleminin öznede içerilmesi",
-      "Bilinç ilkesi"
+      "Zorunlu olmak"
     ],
     "answer": 1,
     "explanation": ""
@@ -639,13 +695,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "33. Aşağıdakilerden hangisi Kant açısından tüm sentetik yargıların özelliklerinden biridir?  a) Zorunlu olmak",
+    "question": "33. Aşağıdakilerden hangisi Kant açısından tüm sentetik yargıların özelliklerinden biridir? ",
     "options": [
       "Göreli olmak",
       "Özne ile yüklem arasında bağıntının başka bir aracı yoluyla sağlanması  d) A priori olmak",
       "A posteriori olmak",
       "Deneyim",
-      "Akıl"
+      "Zorunlu olmak"
     ],
     "answer": 1,
     "explanation": ""
@@ -663,25 +719,25 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "36. Kant’ın sentetik a priori yargılardan söz etmesindeki amaç nedir? a) Newton fiziğinin ilkelerini temellendirmek ister.***",
+    "question": "36. Kant’ın sentetik a priori yargılardan söz etmesindeki amaç nedir? ",
     "options": [
       "Bilimsel çalışma yapmak ister",
       "Aklın sınırlarını çizmek için",
       "Gezegenleri ölçmek için",
       "Bilimi yargılamak ister.",
-      "Uzay formu"
+      "Newton fiziğinin ilkelerini temellendirmek ister."
     ],
-    "answer": null,
+    "answer": 4,
     "explanation": ""
   },
   {
-    "question": "1. Aşağıdakilerden hangisi Kant’ın ahlak görüşünün ilgili olduğu questiondur?  a) Neden?",
+    "question": "1. Aşağıdakilerden hangisi Kant’ın ahlak görüşünün ilgili olduğu questiondur? ",
     "options": [
       "Neyi bilebiliriz?",
       "Ne yapmalıyız?",
       "Ne durumdayız?",
       "Niçin?",
-      "Yargı Gücünün Eleştirisi"
+      "Neden?"
     ],
     "answer": 1,
     "explanation": ""
@@ -711,39 +767,39 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "6. Aşağıdakilerden hangisi Kant açısından ahlakın zorunluluğunun kaynağıdır?  a) Uzlaşımsal olması",
+    "question": "6. Aşağıdakilerden hangisi Kant açısından ahlakın zorunluluğunun kaynağıdır?  ",
     "options": [
       "Toplumsal olması",
       "Saf akla dayanması",
       "Yaptırıma dayanması",
       "Koşullara dayanması",
-      "Teorik akıl"
+      "Uzlaşımsal olması"
     ],
     "answer": 1,
     "explanation": ""
   },
   {
-    "question": "8. Aşağıdakilerden hangisi Kant ahlakının temel kavramlarından biridir? a) Teorik akıl",
+    "question": "8. Aşağıdakilerden hangisi Kant ahlakının temel kavramlarından biridir? ",
     "options": [
       "İyi isteme",
       "Görüsellik",
       "Huy erdemleri",
       "Karakter erdemleri",
-      "Aristoteles’in iyi olmayı önemsememesi"
+      "Teorik akıl"
     ],
     "answer": 0,
     "explanation": ""
   },
   {
-    "question": "10. Aşağıdakilerden hangisi Kant’ın ahlakı temellendirmek için kullandığı bir kavramdır? a) Görev",
+    "question": "10. Aşağıdakilerden hangisi Kant’ın ahlakı temellendirmek için kullandığı bir kavramdır?",
     "options": [
       "Buyruk",
       "Ödev",
       "Öznellik",
       "Yararlılık",
-      "Ödeve dayanması"
+      "Görev"
     ],
-    "answer": 4,
+    "answer": 1,
     "explanation": ""
   },
   {
@@ -759,13 +815,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "13. Aşağıdakilerden hangisi Kant açısından ahlaki bir eylemin koşulunu anlatır?  a) Ödeve bağımlı",
+    "question": "13. Aşağıdakilerden hangisi Kant açısından ahlaki bir eylemin koşulunu anlatır? ",
     "options": [
       "Ödevden dolayı",
       "Ödevden bağımsız",
       "Koşullu",
       "Ödeve uygun",
-      "Koşullu olma"
+      "Ödeve bağımlı"
     ],
     "answer": 0,
     "explanation": ""
@@ -783,27 +839,27 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "17. Aşağıdakilerden hangisi Kant açısından kesin buyruğun bir özelliği olamaz? a) Herhangi bir özel amaçtan bağımsız olması",
+    "question": "17. Aşağıdakilerden hangisi Kant açısından kesin buyruğun bir özelliği olamaz? ",
     "options": [
       "Koşul içermemesi",
       "Belli bir bağlamda geçerli olması",
       "Kaynağının akıl olması",
       "A priori olması",
-      "Kaynağı akıldır."
+      "Herhangi bir özel amaçtan bağımsız olması"
     ],
     "answer": 1,
     "explanation": ""
   },
   {
-    "question": "19. Aşağıdakilerden hangisi Kant’a göre istemenin nesnel temeli olma işlevini görür?  a) İdea",
+    "question": "19. Aşağıdakilerden hangisi Kant’a göre istemenin nesnel temeli olma işlevini görür?  ",
     "options": [
       "Araç",
       "Maksim",
       "Buyruk",
       "Amaç",
-      "Özerklik"
+      "İdea"
     ],
-    "answer": 4,
+    "answer": 3,
     "explanation": ""
   },
   {
@@ -831,13 +887,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "3. Aşağıdakilerden hangisi estetiği güzeli araştıran bir disiplin olarak ele alan ilk kişidir?  a) Locke",
+    "question": "3. Aşağıdakilerden hangisi estetiği güzeli araştıran bir disiplin olarak ele alan ilk kişidir?  ",
     "options": [
       "Baumgarten",
       "Kant",
       "Hume",
       "Voltaire",
-      "Zevk"
+      "Locke"
     ],
     "answer": 0,
     "explanation": ""
@@ -879,15 +935,15 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "8. Aşağıdakilerden hangisi Kant’a göre düşünümsel yargılarının diğer adıdır?  a) Belirleyici yargılar",
+    "question": "8. Aşağıdakilerden hangisi Kant’a göre düşünümsel yargılarının diğer adıdır? ",
     "options": [
       "Analitik yargılar",
       "Sentetik a posteriori yargılar",
       "Sentetik a priori yargılar",
       "Beğeni yargıları",
-      "Anlama yetisine dayanır."
+      "Belirleyici yargılar"
     ],
-    "answer": 4,
+    "answer": 3,
     "explanation": ""
   },
   {
@@ -963,15 +1019,15 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "18. Hangisi Kant açısından duyarlılığın formlarından biri değildir ( biridir olması gerekir)?  a) Uzay***",
+    "question": "18. Hangisi Kant açısından duyarlılığın formlarından biri değildir ( biridir olması gerekir)?  ",
     "options": [
       "Nicelik",
       "Nitelik",
       "Kiplik",
       "Bağıntı",
-      "Bağıntı"
+      "Uzay"
     ],
-    "answer": null,
+    "answer": 4,
     "explanation": ""
   },
   {
@@ -1011,13 +1067,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "3. Aşağıdakilerden hangisi Kant’ın aydınlanmamış olma durumuna yaptığı yakıştırmadır? a) Ergin olmama ***",
+    "question": "3. Aşağıdakilerden hangisi Kant’ın aydınlanmamış olma durumuna yaptığı yakıştırmadır? ",
     "options": [
       "Karanlıkta kalma",
       "Gelişmeme",
       "Erişkin olmama",
       "Erginleşmeme",
-      "Arkadaşlar nedeniyle düşülen ergin olmama durumundan kurtulma  c) Kendi suçuyla düşülen ergin olmama durumundan kurtulma  d) Aile nedeniyle düşülen ergin olmama durumundan kurtulma"
+      "Ergin olmama"
     ],
     "answer": 4,
     "explanation": ""
@@ -1035,13 +1091,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "6. Kant’a göre aydınlanmamış birinin questionmluluğu nerede aranmalıdır? a) Kişinin kendisinde ***",
+    "question": "6. Kant’a göre aydınlanmamış birinin questionmluluğu nerede aranmalıdır?",
     "options": [
       "Devlette",
       "Toplumda",
       "Ebeveynlerinde",
       "Eğitim kurumlarında",
-      "Aklını kullanma cesareti göster"
+      "Kişinin kendisinde"
     ],
     "answer": 4,
     "explanation": ""
@@ -1059,25 +1115,25 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "10. Hangisi Kant’ın aydınlanma aklına ilişkin görüşlerine uygun düşmez? a) Tüm insanlar için geçerlidir.",
+    "question": "10. Hangisi Kant’ın aydınlanma aklına ilişkin görüşlerine uygun düşmez?  ",
     "options": [
       "Herkeste bulunmaz.",
       "Seçkinlere özgü değildir.",
       "Aklı kullanmanın önünde kişinin kendisi dışında engel yoktur.",
       "Cinsiyetçi değildir.",
-      "Yöneticiler"
+      "Tüm insanlar için geçerlidir."
     ],
     "answer": 0,
     "explanation": ""
   },
   {
-    "question": "12. Aşağıdakilerden hangisi Kant açısından aydınlanmanın önünde toplumsal bir engeldir?  a) Arkadaşlar",
+    "question": "12. Aşağıdakilerden hangisi Kant açısından aydınlanmanın önünde toplumsal bir engeldir?",
     "options": [
       "Aile",
       "Kişinin kendisi",
       "Öğretmenler",
       "İfade özgürlüğü",
-      "İfade özgürlüğünü aydınlanma gerekli koşulu olarak görür."
+      "Arkadaşlar"
     ],
     "answer": 3,
     "explanation": ""
@@ -1107,25 +1163,25 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "18. Aşağıdakilerden hangisi Kant’ın aydınlanma anlayışına yönelik bir eleştiridir?  a) Aklı önemsemesi",
+    "question": "18. Aşağıdakilerden hangisi Kant’ın aydınlanma anlayışına yönelik bir eleştiridir? ",
     "options": [
       "Sentetik a priori yargılara dayanması",
       "Sentetik a posteriori yargılara dayanması",
       "İlerlemeyi göz ardı etmesi",
       "Duyguları yok sayması",
-      "Toplumsal çelişkileri gizlemesi"
+      "Aklı önemsemesi"
     ],
-    "answer": 3,
+    "answer": 4,
     "explanation": ""
   },
   {
-    "question": "20. Aşağıdakilerden hangisi Kant aydınlanma anlayışının bir özelliği değildir? a) İlerlemeci olması",
+    "question": "20. Aşağıdakilerden hangisi Kant aydınlanma anlayışının bir özelliği değildir? ",
     "options": [
       "Tüm insanlar için önerilmesi",
       "Özerk insana dayanması",
       "Doğanın amaçlarına uygun olması",
       "Sonunun olması",
-      "Kant"
+      "İlerlemeci olması"
     ],
     "answer": 3,
     "explanation": ""
@@ -1143,25 +1199,25 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "3. Aşağıdakilerden hangisi Kant’ın görünüşlere kaynaklık eden şeylere verdiği addır?  a) Olaylar",
+    "question": "3. Aşağıdakilerden hangisi Kant’ın görünüşlere kaynaklık eden şeylere verdiği addır? ",
     "options": [
       "İdeler",
       "Kendinde şeyler",
       "Fenomenler",
       "Tümeller",
-      "Aykırı"
+      "Olaylar"
     ],
     "answer": 1,
     "explanation": ""
   },
   {
-    "question": "5. Aşağıdakilerden hangisi Kant açısından bilginin ve inancın birliğinin zeminidir? a) Teorik akıl",
+    "question": "5. Aşağıdakilerden hangisi Kant açısından bilginin ve inancın birliğinin zeminidir? ",
     "options": [
       "Anlama yetisi",
       "Görüler",
       "İmgelem",
       "Pratik akıl",
-      "Dizgeci felsefe eğilimi"
+      "Teorik akıl"
     ],
     "answer": 3,
     "explanation": ""
@@ -1191,25 +1247,25 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "9. Aşağıdakilerden hangisi alman idealistlerinin kant felsefesinde questionnlu bulduğu yerdir? a) Kant’ın metafizik anlayışı ***",
+    "question": "9. Aşağıdakilerden hangisi alman idealistlerinin kant felsefesinde questionnlu bulduğu yerdir? ",
     "options": [
       "Kant’ ın yargı anlayışı",
       "Kant’ ın a priori anlayışı",
       "Kant’ ın a pisteriori anlayışı",
       "Kant’ ın mantık anlayışı",
-      "Spinoza"
+      "Kant’ın metafizik anlayışı"
     ],
     "answer": 4,
     "explanation": ""
   },
   {
-    "question": "11. Aşağıdakilerden hangisi Kantçı felsefeyi tek bir ilkeden türetmek ister?  a) Baumgarten",
+    "question": "11. Aşağıdakilerden hangisi Kantçı felsefeyi tek bir ilkeden türetmek ister? ",
     "options": [
       "Reinhold",
       "Jacobi",
       "Spinoza",
       "Descartes",
-      "Özdeşlik ilkesi"
+      "Baumgarten"
     ],
     "answer": 0,
     "explanation": ""
@@ -1239,13 +1295,13 @@ const questionlar = [
     "explanation": ""
   },
   {
-    "question": "17. Aşağıdaki filozoflardan hangisi felsefesinin temelini ‘Ben Olmayan’da bulur? a) Kant",
+    "question": "17. Aşağıdaki filozoflardan hangisi felsefesinin temelini ‘Ben Olmayan’da bulur? ",
     "options": [
       "Fichte",
       "Spinoza",
       "Schelling",
       "Hegel",
-      "Baumgarten"
+      "Kant"
     ],
     "answer": 2,
     "explanation": ""
@@ -1918,7 +1974,7 @@ const questionlar = [
       "Anlamdan"
     ],
     "answer": 1,
-    "explanation": "NOT: Bu question muhtemelen sonradan değiştirilmiş olup kuşku şıkı eklenmiştir.  KUŞKUDAN cevabı Doğru Cevap olacaktır. Içinde “kuşkudan” şıkı yoksa deneyim  yaparsınız"
+    "explanation": "NOT: Bu question muhtemelen sonradan değiştirilmiş olup kuşku şıkı eklenmiştir.  KUŞKUDAN cevabı doğru answer olacaktır. Içinde “kuşkudan” şıkı yoksa deneyim  yaparsınız"
   },
   {
     "question": "Husserlci fenomenoloji ……. arındırılmış bilgiye dayandırılmalıdır.\nYukarıdaki boşluğu en uygun şekilde tamamlayan seçenek aşağıdakilerden  hangisidir?",
@@ -2561,7 +2617,7 @@ const questionlar = [
     "options": [
       "hesaplama",
       "question sorma",
-      "cevaplama",
+      "answerlama",
       "yanlışlama",
       "doğrulama"
     ],
@@ -2813,7 +2869,7 @@ const questionlar = [
 
 let aktifquestion = 0;
 let puan = 0;
-let kullanicicevaplar = new Array(questionlar.length).fill(null);
+let kullaniciCevaplar = new Array(questionlar.length).fill(null);
 
 function gosterquestion() {
   const s = questionlar[aktifquestion];
@@ -2834,9 +2890,9 @@ function gosterquestion() {
 }
 
 function answerSec(index) {
-  if (kullanicicevaplar[aktifquestion] !== null) return;
+  if (kullaniciCevaplar[aktifquestion] !== null) return;
 
-  kullanicicevaplar[aktifquestion] = index;
+  kullaniciCevaplar[aktifquestion] = index;
   const dogruMu = index === questionlar[aktifquestion].answer;
   const geri = document.getElementById("geri-bildirim");
   geri.innerText = dogruMu ? "✅ Doğru!" : `❌ Yanlış! Doğru Cevap: ${questionlar[aktifquestion].options[questionlar[aktifquestion].answer]}`;
@@ -2844,15 +2900,15 @@ function answerSec(index) {
   document.getElementById("aciklama").innerText = `Açıklama: ${questionlar[aktifquestion].explanation}`;
 }
 
-function cevapla() {
-  if (kullanicicevaplar[aktifquestion] === null) {
+function Cevapla() {
+  if (kullaniciCevaplar[aktifquestion] === null) {
     alert("Lütfen bir answer seçin.");
     return;
   }
 }
 
 function sonrakiquestion() {
-  if (kullanicicevaplar[aktifquestion] === null) {
+  if (kullaniciCevaplar[aktifquestion] === null) {
     alert("Lütfen cevabınızı girin.");
     return;
   }
@@ -2893,7 +2949,7 @@ function sonucuGoster() {
 function bastanBasla() {
   aktifquestion = 0;
   puan = 0;
-  kullanicicevaplar = new Array(questionlar.length).fill(null);
+  kullaniciCevaplar = new Array(questionlar.length).fill(null);
   document.getElementById("test").style.display = "block";
   document.getElementById("navigasyon").style.display = "block";
   document.getElementById("sonuc").innerText = "";
