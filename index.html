@@ -36,10 +36,10 @@
 </div>
 
 <div id="navigasyon">
-  <label for="question-sec">questionyu Seç:</label>
+  <label for="question-sec">soruyu Seç:</label>
   <select id="question-sec"></select>
-  <button onclick="answerla()">answerla</button>
-  <button onclick="sonrakiquestion()">Sonraki question</button>
+  <button onclick="cevapla()">cevapla</button>
+  <button onclick="sonrakiquestion()">sonraki soru</button>
   <button onclick="testiBitir()">Testi Bitir</button>
 </div>
 
@@ -1918,7 +1918,7 @@ const questionlar = [
       "Anlamdan"
     ],
     "answer": 1,
-    "explanation": "NOT: Bu question muhtemelen sonradan değiştirilmiş olup kuşku şıkı eklenmiştir.  KUŞKUDAN cevabı doğru answer olacaktır. Içinde “kuşkudan” şıkı yoksa deneyim  yaparsınız"
+    "explanation": "NOT: Bu question muhtemelen sonradan değiştirilmiş olup kuşku şıkı eklenmiştir.  KUŞKUDAN cevabı Doğru Cevap olacaktır. Içinde “kuşkudan” şıkı yoksa deneyim  yaparsınız"
   },
   {
     "question": "Husserlci fenomenoloji ……. arındırılmış bilgiye dayandırılmalıdır.\nYukarıdaki boşluğu en uygun şekilde tamamlayan seçenek aşağıdakilerden  hangisidir?",
@@ -2561,7 +2561,7 @@ const questionlar = [
     "options": [
       "hesaplama",
       "question sorma",
-      "answerlama",
+      "cevaplama",
       "yanlışlama",
       "doğrulama"
     ],
@@ -2813,7 +2813,7 @@ const questionlar = [
 
 let aktifquestion = 0;
 let puan = 0;
-let kullanicianswerlar = new Array(questionlar.length).fill(null);
+let kullanicicevaplar = new Array(questionlar.length).fill(null);
 
 function gosterquestion() {
   const s = questionlar[aktifquestion];
@@ -2834,25 +2834,25 @@ function gosterquestion() {
 }
 
 function answerSec(index) {
-  if (kullanicianswerlar[aktifquestion] !== null) return;
+  if (kullanicicevaplar[aktifquestion] !== null) return;
 
-  kullanicianswerlar[aktifquestion] = index;
+  kullanicicevaplar[aktifquestion] = index;
   const dogruMu = index === questionlar[aktifquestion].answer;
   const geri = document.getElementById("geri-bildirim");
-  geri.innerText = dogruMu ? "✅ Doğru!" : `❌ Yanlış! Doğru answer: ${questionlar[aktifquestion].options[questionlar[aktifquestion].answer]}`;
+  geri.innerText = dogruMu ? "✅ Doğru!" : `❌ Yanlış! Doğru Cevap: ${questionlar[aktifquestion].options[questionlar[aktifquestion].answer]}`;
   if (dogruMu) puan++;
   document.getElementById("aciklama").innerText = `Açıklama: ${questionlar[aktifquestion].explanation}`;
 }
 
-function answerla() {
-  if (kullanicianswerlar[aktifquestion] === null) {
+function cevapla() {
+  if (kullanicicevaplar[aktifquestion] === null) {
     alert("Lütfen bir answer seçin.");
     return;
   }
 }
 
 function sonrakiquestion() {
-  if (kullanicianswerlar[aktifquestion] === null) {
+  if (kullanicicevaplar[aktifquestion] === null) {
     alert("Lütfen cevabınızı girin.");
     return;
   }
@@ -2886,14 +2886,14 @@ function testiBitir() {
 function sonucuGoster() {
   document.getElementById("test").style.display = "none";
   document.getElementById("navigasyon").style.display = "none";
-  document.getElementById("sonuc").innerText = `Toplam ${questionlar.length} questiondan ${puan} doğru answer verdiniz.`;
+  document.getElementById("sonuc").innerText = `Toplam ${questionlar.length} questiondan ${puan} Doğru Cevap verdiniz.`;
   document.getElementById("bastan").style.display = "block";
 }
 
 function bastanBasla() {
   aktifquestion = 0;
   puan = 0;
-  kullanicianswerlar = new Array(questionlar.length).fill(null);
+  kullanicicevaplar = new Array(questionlar.length).fill(null);
   document.getElementById("test").style.display = "block";
   document.getElementById("navigasyon").style.display = "block";
   document.getElementById("sonuc").innerText = "";
