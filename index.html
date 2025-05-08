@@ -1,0 +1,2909 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    .question { font-weight: bold; margin-bottom: 10px; }
+    .options button {
+      display: block;
+      margin: 10px 0;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      cursor: pointer;
+    }
+    .options button:hover { background-color: #e0e0e0; }
+    #navigasyon { margin-top: 20px; }
+    #sonuc { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>Test</h1>
+
+<div id="test">
+  <div class="question" id="question-metin"></div>
+  <div class="options" id="options"></div>
+  <div id="geri-bildirim" style="margin-top:10px; font-weight:bold;"></div>
+  <div id="aciklama" style="margin-top:10px; font-style: italic; color: #555;"></div>
+</div>
+
+<div id="navigasyon">
+  <label for="question-sec">questionyu Seç:</label>
+  <select id="question-sec"></select>
+  <button onclick="answerla()">answerla</button>
+  <button onclick="sonrakiquestion()">Sonraki question</button>
+  <button onclick="testiBitir()">Testi Bitir</button>
+</div>
+
+<div id="sonuc"></div>
+<div id="bastan" style="display:none; margin-top:10px;">
+  <button onclick="bastanBasla()">Baştan Başla</button>
+</div>
+
+<script>
+const questionlar = [
+  {
+    "question": "1. Aşağıdakilerden hangisi Aydınlanma döneminin diğer adıdır?",
+    "options": [
+      "Akıl Çağı",
+      "İnanç Çağı",
+      "Teknik Çağı",
+      "Estetik Çağı",
+      "Kültür Çağı"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "2. Aydınlanmaya aynı zamanda ... da denir.",
+    "options": [
+      "Işık Çağı",
+      "Müzik Çağı",
+      "Karanlık Çağ",
+      "Akıl ÇağI",
+      "Düz Çağ"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "3. Aşağıdakilerden hangisi Aydınlanma düşüncesini niteleyen özelliklerden biri değildir? a) Totaliterlik***",
+    "options": [
+      "Eleştirel rasyonalizm (eleştirel akılcılık)",
+      "Sekülarizm",
+      "İlerlemecilik",
+      "Dogmatizm karşıtlığı",
+      "Ekonomi"
+    ],
+    "answer": null,
+    "explanation": ""
+  },
+  {
+    "question": "5. Aşağıdakilerden hangisi Aydınlanma'dan sonra ortaya çıkmış disiplinlerden biri değildir? a) Tarih",
+    "options": [
+      "Estetik",
+      "Psikoloji",
+      "Antropoloji",
+      "Retorik",
+      "Hutcheson,"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "7. Aşağıdakilerden hangisi İskoç Aydınlanmasının temsilcilerinden biri değildir?  a) Hutcheson",
+    "options": [
+      "Leibniz",
+      "Adam Smith",
+      "Locke",
+      "Hume",
+      "Mendelsohn"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "9. Hangisi aristoteles’in evren görüşüyle uyumsuzdur?",
+    "options": [
+      "Evren sonsuzdur.",
+      "Evren küre biçiminde, hareketsizdir",
+      "Dünya evrenin merkezindedir.",
+      "Evren sonsuz değildir",
+      "Yıldızlar ve gökcisimleri dairesel yörüngelerde hareket eder."
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "10. Aşağıdaki filozoflardan hangisi ilk olarak Dünya’yı evrenin merkezi olmaktan çıkarır?  a) Kopernikus ***",
+    "options": [
+      "Thales",
+      "Brahe",
+      "Galileo",
+      "Newton",
+      "Galileo"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "12. Aşağıdakilerden hangisi modern bilimin temsilcilerinden biri değildir?  a) Einstein ***",
+    "options": [
+      "Brahe",
+      "Galileo",
+      "Newton",
+      "Kopernikus",
+      "Aristoteles"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "14. Aşağıdaki filozoflardan hangisi evrende gerçekleşen çok sayıda olguyu  matematikleştirerek fizik yasalarla açıklanmıştır?",
+    "options": [
+      "Halley",
+      "Galileo",
+      "Newton",
+      "Kepler",
+      "Hooke"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "15. Aşağıdakilerden hangisi Aydınlanmayı ortaya çıkaran koşullardan biri değildir? a) Paylaşım adeletsizliği",
+    "options": [
+      "Kapitalizmin gelişmesi",
+      "İklim değişiklikleri",
+      "Ağır çalışma koşulları",
+      "Eski serflerin şehirlere akın etmesi",
+      "Kapitalist üretime geçilmesi"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "17. Aşağıdakilerden hangisi Aydınlanma düşüncesinin karşı çıktıklarından biri değildir?",
+    "options": [
+      "Eşitlik",
+      "Kilise",
+      "Monarşi",
+      "Kölelik",
+      "Feodalite"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "18. Aşağıdakilerden hangisi aydınlanma filozoflarının yaşam questionnlarına yönelmelerinin bir  nedeni olamaz?",
+    "options": [
+      "Yoksulluk",
+      "Yönetme başarısızlıkları",
+      "Feodal zorbalık",
+      "Metafizik questionnlar",
+      "Toplumsal questionnlar"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "19. Aşağıdakilerden hangisi Aydınlanmacı tutumun özelliği değildir?",
+    "options": [
+      "İnancı kutsama",
+      "İlerlemeyi savunma",
+      "Eleştirel tutum takınma",
+      "Akla vurgu yapma",
+      "Geleneksel yaklaşımları kuşkuyla karşılama"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "1. Aşağıdakilerden hangisi Fransız aydınlanmasının özelliklerinden biri değildir?  a) Barış yanlısı olma ***",
+    "options": [
+      "Sertlik",
+      "Radikalizm",
+      "Evrenselliğe vurgu",
+      "Eşitlik",
+      "Yıkıcı eleştiriyi savunma"
+    ],
+    "answer": null,
+    "explanation": ""
+  },
+  {
+    "question": "3. Aşağıdakilerden hangisi Fransız aydınlanma filozoflarından biri değildir? a) Diderot",
+    "options": [
+      "Voltaire",
+      "Descartes",
+      "D’Alembert",
+      "Bacon",
+      "Bilinmezcidir."
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "5. Aşağıdakilerden hangisi 18. yüzyıl Fransız aydınlanma düşüncesinin bilgi kuramsal açıdan  göze çarpan özelliğidir?",
+    "options": [
+      "Deneyciliğe karşı çıkması b) İdeleri konu etmesi",
+      "Matematiksel olması",
+      "Göreliliği savunması",
+      "Maddeci olması",
+      "Arnauld felsefesi"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "7. Aşağıdakilerden hangisi Fransız aydınlanma düşüncesine fizik görüşü bakımından esin  kaynağı olmuştur?",
+    "options": [
+      "Locke",
+      "Hume",
+      "Leibniz",
+      "Kant",
+      "Descartes"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "8. Aşağıdakilerden hangisi Fransız aydınlanma düşüncesine kaynaklık eden filozoflardan  biridir?",
+    "options": [
+      "Boethius",
+      "Herakleitos",
+      "Spinoza",
+      "Descartes",
+      "Platon"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "9. Aşağıdakilerden hangisi Bacon idollerinden biridir?",
+    "options": [
+      "Toplum",
+      "Soy",
+      "Devlet",
+      "Opera",
+      "Birey"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "10. Aşağıdakilerden hangisi Bacon’un idollerinden biri değildir?",
+    "options": [
+      "Soy",
+      "Mağara",
+      "Çarşı-Pazar",
+      "Norm",
+      "Tiyatro"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "11. Aşağıdakilerden hangisi Bacon’a göre gerçek bilimdir?",
+    "options": [
+      "Metafizik",
+      "Doğa bilimi",
+      "Psikoloji",
+      "Geometri",
+      "Aritmetik"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "12. Aşağıdakilerden hangisi 18. yüzyıl Fransız filozoflarına takılan addır?  a) Atomcular",
+    "options": [
+      "Philosophes",
+      "Deistler",
+      "Mekanistler",
+      "Stoacılar",
+      "İlerlemeci bir dünya görüşü"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "14. Aşağıdakilerden hangisi Fransız aydınlanmasının öncü filozofudur? a) Holbach",
+    "options": [
+      "Diderot",
+      "Lamettrie",
+      "Voltaire",
+      "Condillac",
+      "Çalışanları"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "16. Aşağıdaki filozoflardan hangisi görüşleriyle Fransız Devrimi üzerinde etkili olmuştur? a) Descartes",
+    "options": [
+      "Voltaire",
+      "Locke",
+      "Holbach",
+      "Spinoza",
+      "Diderot"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "18. Aşağıdaki filozoflardan hangisi evreni tek bir maddi töz olarak görür? a) Diderot",
+    "options": [
+      "Lamettrie",
+      "D’Holbach",
+      "D’Lambert",
+      "Voltaire",
+      "Diderot"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "20. Aşağıdakilerden hangisi Ansiklopedi’nin kurucusudur?",
+    "options": [
+      "Holbach",
+      "Voltaire",
+      "Condillac",
+      "Diderot",
+      "Lamettrie"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "21. Aşağıdaki filozoflardan hangisi evreni kendi kendine işleyen bir makine olarak görür? a) D’Alembert",
+    "options": [
+      "Lmettrie",
+      "D’Hobach",
+      "Diderot",
+      "Voltaire",
+      "Locke"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "1. Hangisi Kant açısından bir bilme yetisi değildir?",
+    "options": [
+      "Duyarlılık",
+      "Anlama",
+      "Akıl",
+      "İçgüdü",
+      "Hayal gücü"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "2. Aşağıdakilerden hangisi Kant’a göre bilme yetisi değildir?",
+    "options": [
+      "Dil",
+      "Duyarlık",
+      "Anlama",
+      "Akıl",
+      "İmgelem"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "3. “Bütün bilgimiz deneyimle başlar ancak deneyimden ibaret değildir.” sözünü hangi  düşünür söylemiştir?",
+    "options": [
+      "Spinoza",
+      "Locke",
+      "Kant",
+      "Descartes",
+      "Diderot"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "4. Kant’a göre 'Bütün bilgimiz .... başlar ancak deneyimden ibaret değildir.' Yukarıdaki boşluğu doğru şekilde tamamlayan seçenek aşağıdakilerden hangisidir?",
+    "options": [
+      "Deneyimle",
+      "Doğuştan",
+      "Akılla",
+      "Sezgiyle",
+      "Tasarımla"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "5. Kantı deneyci filozoflardan ayıran özellik nedir?",
+    "options": [
+      "Bilgimizin tamamının deneyimden geldiğini savunması",
+      "Aklın önemine vurgu yapması",
+      "Bilgide deneyime önem vermemesi",
+      "Bütün bilgimizin deneyimden ibaret olmadığını söylemesi",
+      "Bilgimizin doğumla başladığını belirtmesi"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "6. 'Deneyim bir başına ele alındığında ancak bilginin içeriğini verebilir. Oysa içeriğin bilgi  olabilmesi için ona bir biçim kazandırmak gerekir. İşte bu biçimi veren ... yetileridir.'",
+    "options": [
+      "Bilme",
+      "Anlama",
+      "His",
+      "Sezgi",
+      "Duyma"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "7. Aşağıdaki filozoflardan hangisi Kant açısından aklın kendi kaynakları yoluyla elde ettiği  bilgidir? (question bu şekilde hatalı ifade ile questionlmuş)",
+    "options": [
+      "Deneysel",
+      "Tasarımsal",
+      "A posteriori",
+      "A forteriori",
+      "A priori"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "8. Aşağıdakilerden hangisi Kant açısından deneyle hiçbir biçimde ilişkili değildir? a) İmgesel bilgi",
+    "options": [
+      "Olağan bilgi",
+      "A priori bilgi",
+      "A posteriori bilgi",
+      "Saf bilgi",
+      "Gemüt"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "10. Bilme yetileri Kant’ın gemüt adını verdiği bütünde yer alır. Bu yetiler hangi öbeklerde  toplanır?",
+    "options": [
+      "Duygusal ve analitik",
+      "Duygusal ve düşünsel",
+      "İmgesel ve düşünsel",
+      "Duyulur ve a priori",
+      "Duyarlılık ve imgelem"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "11. Gemütün düşünsellikle alakalı olan yanları hangisidir?",
+    "options": [
+      "Duyarlılık",
+      "İmgelem",
+      "Anlama yetisi ve akıl *",
+      "İçgörü",
+      "Hayal gücü"
+    ],
+    "answer": null,
+    "explanation": ""
+  },
+  {
+    "question": "12. Gemütün duyusal yanı nedir?",
+    "options": [
+      "Duyarlılık",
+      "İmgelem",
+      "Akıl",
+      "Anlama yetisi",
+      "Hayalgücü"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "13. Aşağıdakilerden hangisi Kant açısından tüm insan bilgisinin başlangıcında yer alır? a) İdea",
+    "options": [
+      "Kavram",
+      "Görü",
+      "Kategori",
+      "Nesne",
+      "İdea"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "15. Aşağıdakilerden hangisi Kant açısından görünün bir formudur? a) Uzay ***",
+    "options": [
+      "Nitelik",
+      "Birlik",
+      "Durum",
+      "Nicelik",
+      "Uzay ve zaman"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "17. Aşağıdakilerden hangisi Kant açısından tasarımları sentezleyen yetilerden biridir?  a) Duyarlık",
+    "options": [
+      "Akıl",
+      "Nous",
+      "Phren",
+      "Anlama yetisi",
+      "Kendisinde taşıdığı mantıksal işlevler ve kategoriler aracılığıyla"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "19. Kant’a göre aşağıdaki yetilerden hangisi mantıksal işlevleri yoluyla tasarımları düzenler? a) Duyarlık",
+    "options": [
+      "Anlama",
+      "Akıl",
+      "İmgelem",
+      "Tasarlama",
+      "Anlama"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "21. Kant’a göre aşağıdaki yetilerden hangisi çıkarım ve kıyas yapmayı sağlar? a) Duyarlılık",
+    "options": [
+      "Anlama",
+      "Akıl",
+      "İmgelem",
+      "Tasarlama",
+      "Çıkarım ve kıyas yapmayı sağlayan yetidir."
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "23. Özlü anlatımıyla bilginin olanaklarını ve sınırlarını araştıran felsefe aşağıdakilerden  hangisidir?",
+    "options": [
+      "Klasik felsefe",
+      "Transendental felsefe",
+      "Analitik felsefe",
+      "Pozitivist felsefe",
+      "Rasyonalist felsefe"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "25. Kant bilgi questionnunu ele alırken tartışmayı ne üzerinden yürütür? a) Deneyim",
+    "options": [
+      "Akıl",
+      "Yargı",
+      "Görü",
+      "Duyarlık",
+      "Akıl"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "27. Aşağıdakilerden hangisi Kant’ın yargılara ilişkin yaptığı bölümlemelerden biri değildir? a) A priori yargı",
+    "options": [
+      "A posteriori yargı",
+      "Analitik a posteriori yargı",
+      "Analitik yargı",
+      "Sentetik yargı",
+      "A priori"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "29. ............ yargı ise deneyim yoluyla kazanılan yargıdır. Boşluğa uygun gelecek kelime  hangisidir?",
+    "options": [
+      "A priori",
+      "A posteriori",
+      "Analitik a posteriori",
+      "Analitik",
+      "Sentetik"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "30. Aşağıdakilerden hangisi Kant açısından analitik yargının bir özelliği değildir?  a) Zorunlu olmak",
+    "options": [
+      "Çelişmezlik ilkesine dayanmak",
+      "Yeni bilgi vermek",
+      "A priori olmak",
+      "Yargının yükleminin öznede içerilmesi",
+      "Bilinç ilkesi"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "32. Analitik yargılar, nasıl yargılardır?",
+    "options": [
+      "Açıklayıcı",
+      "Betimleyici",
+      "Belirleyici",
+      "Özdeş",
+      "Kanıtlayıcı"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "33. Aşağıdakilerden hangisi Kant açısından tüm sentetik yargıların özelliklerinden biridir?  a) Zorunlu olmak",
+    "options": [
+      "Göreli olmak",
+      "Özne ile yüklem arasında bağıntının başka bir aracı yoluyla sağlanması  d) A priori olmak",
+      "A posteriori olmak",
+      "Deneyim",
+      "Akıl"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "35. Kant açısından deneyim nedir?",
+    "options": [
+      "Algılama",
+      "Öğrenme",
+      "Algıların analizi",
+      "Bir olayı görme",
+      "Algıların (sürekli) sentezi"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "36. Kant’ın sentetik a priori yargılardan söz etmesindeki amaç nedir? a) Newton fiziğinin ilkelerini temellendirmek ister.***",
+    "options": [
+      "Bilimsel çalışma yapmak ister",
+      "Aklın sınırlarını çizmek için",
+      "Gezegenleri ölçmek için",
+      "Bilimi yargılamak ister.",
+      "Uzay formu"
+    ],
+    "answer": null,
+    "explanation": ""
+  },
+  {
+    "question": "1. Aşağıdakilerden hangisi Kant’ın ahlak görüşünün ilgili olduğu questiondur?  a) Neden?",
+    "options": [
+      "Neyi bilebiliriz?",
+      "Ne yapmalıyız?",
+      "Ne durumdayız?",
+      "Niçin?",
+      "Yargı Gücünün Eleştirisi"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "3. Kant ahlakı .... temellerde kurmak istiyordu.",
+    "options": [
+      "Sentetik a priori",
+      "A posteriori",
+      "Analitik",
+      "Sentetik",
+      "Kişiselliğine"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "5. Kant ahlakta kalıcılığı aradığı yer nedir?",
+    "options": [
+      "Saf Akıl",
+      "Uzlaşım",
+      "Koşul",
+      "Yaptırım",
+      "Toplum"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "6. Aşağıdakilerden hangisi Kant açısından ahlakın zorunluluğunun kaynağıdır?  a) Uzlaşımsal olması",
+    "options": [
+      "Toplumsal olması",
+      "Saf akla dayanması",
+      "Yaptırıma dayanması",
+      "Koşullara dayanması",
+      "Teorik akıl"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "8. Aşağıdakilerden hangisi Kant ahlakının temel kavramlarından biridir? a) Teorik akıl",
+    "options": [
+      "İyi isteme",
+      "Görüsellik",
+      "Huy erdemleri",
+      "Karakter erdemleri",
+      "Aristoteles’in iyi olmayı önemsememesi"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "10. Aşağıdakilerden hangisi Kant’ın ahlakı temellendirmek için kullandığı bir kavramdır? a) Görev",
+    "options": [
+      "Buyruk",
+      "Ödev",
+      "Öznellik",
+      "Yararlılık",
+      "Ödeve dayanması"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "12. Aşağıdakilerden hangisi Kant’a göre ahlaki bir eylemdir?",
+    "options": [
+      "Suç sayılacağı için hırsızlık yapmama",
+      "Toplumsal baskı nedeniyle yalan söylememe",
+      "Ödevden dolayı hırsızlık yapmama",
+      "Yakalanacağından korktuğundan hırsızlık yapmama",
+      "Ödeve uygunluğundan hırsızlık yapmama"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "13. Aşağıdakilerden hangisi Kant açısından ahlaki bir eylemin koşulunu anlatır?  a) Ödeve bağımlı",
+    "options": [
+      "Ödevden dolayı",
+      "Ödevden bağımsız",
+      "Koşullu",
+      "Ödeve uygun",
+      "Koşullu olma"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "15. Kant' a göre istemenin öznel ilkesi .....",
+    "options": [
+      "Yasalar",
+      "Maksim",
+      "Gelenekler",
+      "Görenekler",
+      "Yasalar"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "17. Aşağıdakilerden hangisi Kant açısından kesin buyruğun bir özelliği olamaz? a) Herhangi bir özel amaçtan bağımsız olması",
+    "options": [
+      "Koşul içermemesi",
+      "Belli bir bağlamda geçerli olması",
+      "Kaynağının akıl olması",
+      "A priori olması",
+      "Kaynağı akıldır."
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "19. Aşağıdakilerden hangisi Kant’a göre istemenin nesnel temeli olma işlevini görür?  a) İdea",
+    "options": [
+      "Araç",
+      "Maksim",
+      "Buyruk",
+      "Amaç",
+      "Özerklik"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "1. Aşağıdakilerden hangisi Kant’ın estetikle ilgili eserinin adıdır?",
+    "options": [
+      "Yargı Gücünün Eleştirisi",
+      "Saf Aklın Eleştirisi",
+      "İnsan Anlığı Üzerine Bir Deneme",
+      "Prolegomena",
+      "Pratik Aklın Eleştirisi"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "2. Estetiği bugünkü anlamıyla güzeli araştıran bir disiplin olarak ele alan ilk kişi …….... Yukarıdaki boşluğu doğru şekilde tamamlayan seçeneği bulunuz.",
+    "options": [
+      "Leibniz",
+      "Descartes",
+      "Locke",
+      "Baumgarten",
+      "Voltaire"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "3. Aşağıdakilerden hangisi estetiği güzeli araştıran bir disiplin olarak ele alan ilk kişidir?  a) Locke",
+    "options": [
+      "Baumgarten",
+      "Kant",
+      "Hume",
+      "Voltaire",
+      "Zevk"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "5. Kant açısından , .... bilmenin alanı olan doğa ile özgürlük alanı olan ahlak arasında bağ  kurmaya yarar.",
+    "options": [
+      "Estetik yargılar",
+      "Analitik yargılar",
+      "A priori yargılar",
+      "Etik yargılar",
+      "A posteriori yargılar"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "6. Aşağıdakilerden hangisi Kant’a göre estetikle ilgili yargılardır?",
+    "options": [
+      "Sentetik a posteriori yargılar",
+      "Sentetik a priori yargılar",
+      "Düşünümsel yargılar",
+      "Analitik yargılar",
+      "Belirleyici yargılar"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "7. Aşağıdakilerden hangisi Kant açısından estetik yargı türüdür?",
+    "options": [
+      "Düşünümsel yargılar",
+      "Sentetik a posteriori yargılar",
+      "Sentetik a priori yargılar",
+      "Analitik yargılar",
+      "Belirleyici yargılar"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "8. Aşağıdakilerden hangisi Kant’a göre düşünümsel yargılarının diğer adıdır?  a) Belirleyici yargılar",
+    "options": [
+      "Analitik yargılar",
+      "Sentetik a posteriori yargılar",
+      "Sentetik a priori yargılar",
+      "Beğeni yargıları",
+      "Anlama yetisine dayanır."
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "10. Kant açısından beğeni yargısının zemini ………….",
+    "options": [
+      "Özneldir",
+      "Nesneldir",
+      "Değişmez",
+      "Aşkındır",
+      "İmgeleme yetisine dayanmak"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "12. Kant açısından beğeni yargısını belirleyen hoşlanma ..........",
+    "options": [
+      "Kesindir.",
+      "Karşılıklıdır.",
+      "Anlamlıdır.",
+      "Mutlaktır.",
+      "Toplumsal uzlaşım"
+    ],
+    "answer": null,
+    "explanation": ""
+  },
+  {
+    "question": "14. Aşağıdakilerden hangisi Kant açısından beğeni yargılarının belirli bir bağlamda nesnel  olmasını sağlar?",
+    "options": [
+      "Herkeste bulunan koşullarla ilgili olması",
+      "Belirli kişilere özgü olması",
+      "Öznel olması",
+      "Eşit olmaması",
+      "Sadece o duruma özel olması"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "15. Aşağıdaki durumlardan hangisi Kant açısından insanlar ve hayvanlarca ortak  deneyimlenir?",
+    "options": [
+      "Çıkar",
+      "Adalet",
+      "İyi",
+      "Güzel",
+      "Hoşa giden"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "16. Aşağıdakilerden hangisi Kant açısından beğeni yargısını belirleyen hoşlanmanın  özelliğidir?",
+    "options": [
+      "Nesnel olma",
+      "Saf olma",
+      "Çıkarsız olma",
+      "Aşkın olma",
+      "Öğretici olma"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "17. Aşağıdakilerden hangisi Kant’a göre herhangi bir çıkar gözetilmeyen hoşlanma nesnesini  niteler?",
+    "options": [
+      "İyi",
+      "Güzel",
+      "Erdemli",
+      "Hoşa giden",
+      "Yararlı"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "18. Hangisi Kant açısından duyarlılığın formlarından biri değildir ( biridir olması gerekir)?  a) Uzay***",
+    "options": [
+      "Nicelik",
+      "Nitelik",
+      "Kiplik",
+      "Bağıntı",
+      "Bağıntı"
+    ],
+    "answer": null,
+    "explanation": ""
+  },
+  {
+    "question": "20. Kant’a göre ..... açısından beğeni yargısı güzeli kavramlar olmadan, evrensel bir  hoşlanmanın nesnesi olarak tasarımlanan şey .",
+    "options": [
+      "Nicelik",
+      "Nitelik",
+      "Kiplik",
+      "İyelik",
+      "Nicelik"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "1. Aşağıdakilerden hangisi Alman aydınlanması için geçerlidir?",
+    "options": [
+      "Voltaire’le başlar.",
+      "İskoç aydınlanmasının baskın etkisinde kalmıştır.",
+      "Yalnızca Kant’la sınırlıdır.",
+      "Fransız aydınlanmasının baskın etkisinde kalmıştır.",
+      "Homojen değildir."
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "2. Aşağıdakilerden hangisi Alman aydınlanmasının bir özelliğidir?",
+    "options": [
+      "Geleneğe vurgu",
+      "Siyasal söylem birliği",
+      "Matematik bilimleri örnek alma",
+      "Şiddet yanlısı olma",
+      "Aydınlanma konusunda görüş ayrılığı"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "3. Aşağıdakilerden hangisi Kant’ın aydınlanmamış olma durumuna yaptığı yakıştırmadır? a) Ergin olmama ***",
+    "options": [
+      "Karanlıkta kalma",
+      "Gelişmeme",
+      "Erişkin olmama",
+      "Erginleşmeme",
+      "Arkadaşlar nedeniyle düşülen ergin olmama durumundan kurtulma  c) Kendi suçuyla düşülen ergin olmama durumundan kurtulma  d) Aile nedeniyle düşülen ergin olmama durumundan kurtulma"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "5. Aşağıdakilerden hangisi Kant açısından aydınlanmayı niteler?",
+    "options": [
+      "Ergin olmamadan kurtuluş",
+      "Kişisellikten kurtuluş",
+      "Geleneksel yaklaşımlardan uzaklaşma",
+      "Güzel olana yönelik ilgi",
+      "Ahlaki yeterlilik"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "6. Kant’a göre aydınlanmamış birinin questionmluluğu nerede aranmalıdır? a) Kişinin kendisinde ***",
+    "options": [
+      "Devlette",
+      "Toplumda",
+      "Ebeveynlerinde",
+      "Eğitim kurumlarında",
+      "Aklını kullanma cesareti göster"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "8. Kant açısından aydınlanmanın temeli ............. .",
+    "options": [
+      "Toplumdur",
+      "Duyarlıktır",
+      "Meraktır",
+      "Akıldır",
+      "Seçkinlerde bulunur."
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "10. Hangisi Kant’ın aydınlanma aklına ilişkin görüşlerine uygun düşmez? a) Tüm insanlar için geçerlidir.",
+    "options": [
+      "Herkeste bulunmaz.",
+      "Seçkinlere özgü değildir.",
+      "Aklı kullanmanın önünde kişinin kendisi dışında engel yoktur.",
+      "Cinsiyetçi değildir.",
+      "Yöneticiler"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "12. Aşağıdakilerden hangisi Kant açısından aydınlanmanın önünde toplumsal bir engeldir?  a) Arkadaşlar",
+    "options": [
+      "Aile",
+      "Kişinin kendisi",
+      "Öğretmenler",
+      "İfade özgürlüğü",
+      "İfade özgürlüğünü aydınlanma gerekli koşulu olarak görür."
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "14. Aşağıdakilerden hangisi Kant açısından aydınlanmaya zarar vereceği için kısıtlanmalıdır? a) Din görevlisinin vaaz vermesi",
+    "options": [
+      "Şoförün yolculuk sırasında konuşmaması",
+      "Edebiyat öğretmeninin şiir hakkında konuşması",
+      "Subayın tatilde siyaset üstüne konuşması",
+      "Matematik öğretmeninin sınıfta eğitim sistemini eleştirmesi",
+      "Aydınlanma"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "16. Kant’a göre ..... bir toplumda bile aydınlanmanın olanağı bulunur. Yukarıdaki boşluğu doğru şekilde tamamlayan seçenek aşağıdakilerden hangisidir? a) Gelişmemiş",
+    "options": [
+      "Geri kalmış",
+      "Modern",
+      "Eski",
+      "Aydınlanmamış",
+      "Kendini düşünmek"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "18. Aşağıdakilerden hangisi Kant’ın aydınlanma anlayışına yönelik bir eleştiridir?  a) Aklı önemsemesi",
+    "options": [
+      "Sentetik a priori yargılara dayanması",
+      "Sentetik a posteriori yargılara dayanması",
+      "İlerlemeyi göz ardı etmesi",
+      "Duyguları yok sayması",
+      "Toplumsal çelişkileri gizlemesi"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "20. Aşağıdakilerden hangisi Kant aydınlanma anlayışının bir özelliği değildir? a) İlerlemeci olması",
+    "options": [
+      "Tüm insanlar için önerilmesi",
+      "Özerk insana dayanması",
+      "Doğanın amaçlarına uygun olması",
+      "Sonunun olması",
+      "Kant"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "2. Aşağıdakilerden hangisi Alman idealizminin çıkış noktasıdır?",
+    "options": [
+      "Descartes",
+      "Hume",
+      "Aristoteles",
+      "Kant",
+      "Baumgarten"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "3. Aşağıdakilerden hangisi Kant’ın görünüşlere kaynaklık eden şeylere verdiği addır?  a) Olaylar",
+    "options": [
+      "İdeler",
+      "Kendinde şeyler",
+      "Fenomenler",
+      "Tümeller",
+      "Aykırı"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "5. Aşağıdakilerden hangisi Kant açısından bilginin ve inancın birliğinin zeminidir? a) Teorik akıl",
+    "options": [
+      "Anlama yetisi",
+      "Görüler",
+      "İmgelem",
+      "Pratik akıl",
+      "Dizgeci felsefe eğilimi"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "7. Aşağıdakilerden hangisi Alman idealistlerinin ortak özelliğidir?",
+    "options": [
+      "\"Ben\"i başlangıç noktası saymaları",
+      "Başlangıç olarak tek bir ilkeden hareket etmeleri",
+      "\"Tin\"den başlamaları",
+      "Duyarlığa vurgu yapmaları",
+      "\"Kaos\"u başlangıç noktası saymaları"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "8. Aşağıdakilerden hangisi Alman idealistlerinin her şeyi kendisinden türettikleri ilkenin  özelliğidir?",
+    "options": [
+      "A posteriori",
+      "Çelişik olma",
+      "Mutlak olma",
+      "Göreli",
+      "Sentetik olma"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "9. Aşağıdakilerden hangisi alman idealistlerinin kant felsefesinde questionnlu bulduğu yerdir? a) Kant’ın metafizik anlayışı ***",
+    "options": [
+      "Kant’ ın yargı anlayışı",
+      "Kant’ ın a priori anlayışı",
+      "Kant’ ın a pisteriori anlayışı",
+      "Kant’ ın mantık anlayışı",
+      "Spinoza"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "11. Aşağıdakilerden hangisi Kantçı felsefeyi tek bir ilkeden türetmek ister?  a) Baumgarten",
+    "options": [
+      "Reinhold",
+      "Jacobi",
+      "Spinoza",
+      "Descartes",
+      "Özdeşlik ilkesi"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "13. ... Kant’ın ahlaki ideali ile Spinoza’nın tüm tanrıcılığını birleştiren bir dizge kurar. Yukardaki boşluğu doğru şekilde tamamlayan seçenek aşağıdakilerden hangisidir? a) Schelling",
+    "options": [
+      "Spinoza",
+      "Fichte",
+      "Reinhold",
+      "Jakobi",
+      "Spinoza"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "15. Fichte’ye göre bütün gerçekliğin kaynağı .............",
+    "options": [
+      "Algıdır",
+      "Maddedir",
+      "Doğadır",
+      "Ben’dir.",
+      "Fichte"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "17. Aşağıdaki filozoflardan hangisi felsefesinin temelini ‘Ben Olmayan’da bulur? a) Kant",
+    "options": [
+      "Fichte",
+      "Spinoza",
+      "Schelling",
+      "Hegel",
+      "Baumgarten"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "19. Yaratıcı doğa ifadesi aşağıdaki filozoflardan hangisine aittir?",
+    "options": [
+      "Kant",
+      "Fichte",
+      "Spinoza",
+      "Schelling",
+      "Hegel"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "1) Aşağıdakilerden hangisi Hegel ‘in felsefesinde diğerlerinden farklı bir anlam  taşıyan kavramdır? FİNAL-2016",
+    "options": [
+      "Görü",
+      "bir",
+      "mutlak",
+      "tin",
+      "akıl"
+    ],
+    "answer": 0,
+    "explanation": "Görü (Farklı olanı questionyor)"
+  },
+  {
+    "question": "2) Aşağıdakilerden hangisi Hegel ’e göre hem varlığın hem de düşüncenin gelişme  biçimidir? FİNAL 2014",
+    "options": [
+      "Diyalektik",
+      "Analitik",
+      "A priori",
+      "A posteriori",
+      "Sentetik"
+    ],
+    "answer": 0,
+    "explanation": "Hegel açısından diyalektik hem düşünmenin hem de varlığın gelişme biçimidir."
+  },
+  {
+    "question": "3) Hegel’e göre saf düşüncenin yapısı hangisidir? FİNAL-2015,BÜT-2015, BÜT-2016",
+    "options": [
+      "Durağan",
+      "Rasyonel",
+      "Kavramsal",
+      "Diyalektik",
+      "Tek düze"
+    ],
+    "answer": 3,
+    "explanation": "Saf düşünce (İde) ve onun belirlenimlerinin diyalektik gelişiminin incelenmesiydi."
+  },
+  {
+    "question": "4) Aşağıdakilerden hangisi Hegel felsefesini tanımlayan bir ifadedir? FİNAL-2014",
+    "options": [
+      "Erekselci neden",
+      "Mekanik neden",
+      "Formel neden",
+      "Analitik neden",
+      "Pozitivist neden"
+    ],
+    "answer": 0,
+    "explanation": "Hegel felsefesini tanımlayan bir ifade: Erekselci nedensellik"
+  },
+  {
+    "question": "5) Hegel felsefesine göre “geist”in en ileri aşaması hangisidir? FİNAL-2014",
+    "options": [
+      "Duyum",
+      "Algı",
+      "Bilinç",
+      "Öz bilinç",
+      "Soyutluk"
+    ],
+    "answer": 3,
+    "explanation": "Öz bilinç"
+  },
+  {
+    "question": "6) Aşağıdakilerden hangisi Hegel”e göre aklın eş anlamlısıdır?",
+    "options": [
+      "Saf akıl",
+      "Görü",
+      "Tin",
+      "Pratik akıl",
+      "Zihin"
+    ],
+    "answer": 2,
+    "explanation": "Hegel felsefesinde “akıl” kavramını “tin” kavramıyla eş anlamlı kullanır."
+  },
+  {
+    "question": "7) Aşağıdakilerden hangisi Hegel”in felsefesinde geliştirdiği bir kavramdır?",
+    "options": [
+      "Tin",
+      "Anlam yetisi",
+      "Sezgi",
+      "İdea",
+      "Dil"
+    ],
+    "answer": 0,
+    "explanation": "Tin"
+  },
+  {
+    "question": "8) Aşağıdakilerden hangisi Hegel felsefesinin başında yer alır?",
+    "options": [
+      "Arkhe",
+      "Din",
+      "Dil",
+      "Tin"
+    ],
+    "answer": 3,
+    "explanation": "Hegel açısından gerçeklik, organik bir bütündür; aynı zamanda Tin’dir."
+  },
+  {
+    "question": "9) Akli olan gerçektir, gerçek olan aklidir. Sözü aşağıdaki filozoflardan hangisine  aittir?",
+    "options": [
+      "Leibniz",
+      "Spinoza",
+      "Fichte",
+      "Hegel"
+    ],
+    "answer": 3,
+    "explanation": "Hegel’e göre akli olan gerçektir, gerçek olan aklidir."
+  },
+  {
+    "question": "10) Aşağıdakilerden hangisi Hegel'in gerçeklik kavrayışını niteler? ",
+    "options": [
+      "Atomik",
+      "Mekanik",
+      "Matematiksel",
+      "Parcali",
+      "Organik"
+    ],
+    "answer": 4,
+    "explanation": "Hegel açısından gerçeklik, organik bir bütündür; aynı zamanda Tin’dir."
+  },
+  {
+    "question": "11) Aşağıdakilerden hangisi Hegel felsefesinde bilincin oluşumunun çeşitli evrelere  yayılmasına yol açar?",
+    "options": [
+      "Bireşim",
+      "Uyum",
+      "Çelişkiler",
+      "İdealar",
+      "İnsanlar"
+    ],
+    "answer": 2,
+    "explanation": "Çelişkiler"
+  },
+  {
+    "question": "12) Hegel'de hangi ikisi eş değerdedir? FİNAL-2019",
+    "options": [
+      "Düşünce-Varlık",
+      "Tarih-felsefe",
+      "Tarih toplum",
+      "Felsefe-sanat",
+      "Toplum-birey"
+    ],
+    "answer": 0,
+    "explanation": "Hegel felsefesi aynı zamanda özdeşlik felsefesidir. Her gerçek olan bir ve aynı  Mutlak, yaşayan Tin’dir."
+  },
+  {
+    "question": "Bir şey Tin’in gelişim aşamalarında bir yerde ise düşünce ve varlık bir ve aynı  şeydir\n13)\nI. Birey\nII. Toplum\nIII. Düşünce\nIV. Varlık\nYukarıdakilerden hangi ikisi hegel felsefesinde özdeştir?",
+    "options": [
+      "III-IV",
+      "II-III",
+      "I-III",
+      "I-II",
+      "I-IV"
+    ],
+    "answer": 0,
+    "explanation": "Hegel felsefesi aynı zamanda özdeşlik felsefesidir. Her gerçek olan bir ve aynı  Mutlak, yaşayan Tin’dir.Bir şey Tin’in gelişim aşamalarında bir yerde ise düşünce ve varlık bir ve aynı  şeydir"
+  },
+  {
+    "question": "14) Hegel diyalektiği ile ilgili hangisi söylenemez?",
+    "options": [
+      "çelişkileri gelişim ile ilişkilendirir",
+      "tarihseldir",
+      "varlığın gelişme biçimidir",
+      "aşamalıdır",
+      "düşünmenin gelişme biçimidir"
+    ],
+    "answer": 4,
+    "explanation": "bu question geçen sene çıktı ve sanırım iptal oldu. Bütün şıklar doğru gibi. Sınavda  çıkarsa burada olmayan şıkı işaretlersiniz."
+  },
+  {
+    "question": "15) “1807 yılında yayınlanan … adlı ilk büyük yapıtında Hegel, Tin (Geist) kavramını  felsefeye katar.”\nYukarıdaki boşluğu doğru şekilde tamamlayan seçenek aşağıdakilerden hangisidir?",
+    "options": [
+      "İnanmak ve Bilmek",
+      "Tinin Fenomenolojisi",
+      "Mantık Bilimi",
+      "Tarih Felsefesi",
+      "Hukuk Felsefesinin İlkeleri"
+    ],
+    "answer": 1,
+    "explanation": "1807 yılında yayınlanan Tinin Fenomenolojisi (Das Phänomenologie des Geistes)  adlı ilk büyük yapıtında, Schelling’den kesin biçimde ayrılır."
+  },
+  {
+    "question": "1. Marks üzerinde hangisi kayda değer etki bırakmıştır? FİNAL-2015, BÜT-2015,  BÜT-2016",
+    "options": [
+      "İlkçağ felsefesi",
+      "Klasik Alman İdealizmi",
+      "Reform hareketleri",
+      "Rönesans",
+      "Descartes felsefesi"
+    ],
+    "answer": 1,
+    "explanation": "Marks’ın felsefi gelişimi üzerinde üç etki görülür. Bunlar;"
+  },
+  {
+    "question": "1. klasik Alman felsefesi\n2. İngiliz klasik politik ekonomisi\n3.Fransız maddeci düşüncesi\n2. Aşağıdakilerden hangisi Marx’a göre bir toplumun gelişmişlik düzeyinin temel  belirleyicisidir? FİNAL-2014",
+    "options": [
+      "Temel üretim ilişkileri",
+      "Ekonomik seviyesi",
+      "Eğitim seviyesi",
+      "Coğrafi konumu",
+      "Kültürel zenginliği"
+    ],
+    "answer": 0,
+    "explanation": "Temel üretim ilişkileri"
+  },
+  {
+    "question": "3. Marks açısından kapitalist toplumun evrilecegi toplum hangisidir? FİNAL-2016",
+    "options": [
+      "Antikapitalist toplum",
+      "Üretim araçlarının işçilerde olacağı toplum",
+      "Postmodernist toplum",
+      "Maddeci, tarihselci toplum",
+      "Üretim araçlarının ortak mülkiyetinin olduğu toplum"
+    ],
+    "answer": 4,
+    "explanation": "Kapitalist toplum kendinde taşıdığı çelişkilerle, bir başka topluma, üretim  araçlarının mülkiyetinin ortak olduğu bir topluma evrilecektir."
+  },
+  {
+    "question": "4. Marks’a göre insanın türsel yaşamının bir parçası nedir ? FİNAL-2016",
+    "options": [
+      "Doğayı işleyip üretmek",
+      "Çocuk yapmak",
+      "Mülk edinmek",
+      "Evlilik",
+      "Eğitim"
+    ],
+    "answer": 0,
+    "explanation": "Marks açısından , Özgür bilinçli etkinlik insanın türsel karakterini oluşturur. İnsanın  doğayı işleyip üretmesi, onun türsel yaşamıdır."
+  },
+  {
+    "question": "5. Marks’a göre işçinin yabancılaşması nede olur? FİNAL-2015,BÜT-2015, BÜT 2016",
+    "options": [
+      "Toplumsal ayrışmada",
+      "Kendi ürettiği emeğin üzerinde kontrolü yitirmesi",
+      "Grup kimliğinde",
+      "Ekonomik göstergelerde",
+      "Üretim faaliyetlerinde"
+    ],
+    "answer": 1,
+    "explanation": "Kendi ürettiği emeğin üzerinde kontrolü yitirmesi"
+  },
+  {
+    "question": "6. Marks’a göre insanı diğer canlılardan ayırt eden hangisidir? FİNAL-2014",
+    "options": [
+      "Yaşam biçimi",
+      "Ekonomik faaliyeti",
+      "Sosyalliği",
+      "Konuşması",
+      "Emek"
+    ],
+    "answer": 4,
+    "explanation": "Emek"
+  },
+  {
+    "question": "7) Marks”ın tarih anlayışı hangisidir?",
+    "options": [
+      "Mekanik",
+      "İdealist",
+      "Tekçi",
+      "Tarihsel maddecilik",
+      "Analitik"
+    ],
+    "answer": 3,
+    "explanation": "Tarihsel maddecilik"
+  },
+  {
+    "question": "8) Aşağıdakilerden hangisi Marks açısından tüm insanlık tarihi boyunca etkili  olmuştur?",
+    "options": [
+      "Sınıf çatışmaları",
+      "Tarım",
+      "Felsefe",
+      "Madencilik",
+      "E-devlet"
+    ],
+    "answer": 0,
+    "explanation": "Marks’a göre “tüm tarih sınıf çatışmalarının bir tarihi olmuştur.”"
+  },
+  {
+    "question": "9) Aşağıdakilerden hangisi Marksa göre insan düşünüşünü diğerlerine göre daha  derinden etkiler?",
+    "options": [
+      "ailesi",
+      "sınıfsal konumu",
+      "dinsel görüşleri",
+      "çoçukluk anıları",
+      "mesleği"
+    ],
+    "answer": 1,
+    "explanation": "sınıfsal konumu"
+  },
+  {
+    "question": "Aşağıdakilerden hangisi analitik felsefe düşünürü değildir? FİNAL-2015,BÜT-2015,  BÜT-2016",
+    "options": [
+      "Russell",
+      "Frege",
+      "Heidegger",
+      "Peano",
+      "Peirce"
+    ],
+    "answer": 2,
+    "explanation": "Analitik felsefenin öncü filozofları Frege, Russell ve Wittgenstein’dır. Boole ile birlikte matematiksel mantık ortaya çıkar."
+  },
+  {
+    "question": "Jevons, Venn, MorganAristoteles mantığının sınırlı olduğunu ileri sürer, yeni  mantığı hazırlayan çalışmalar yaparlar.\nPeano, Peirce ve Frege sembolik bir dil oluşturur.\nPeano, sembolizm üzerinde durur.\nPeirce, bağıntı mantığı oluşturur.\nAşağıdakilerden hangisi matematiği mantığa indirger? FİNAL-2015, BÜT-2015, BÜT  2016",
+    "options": [
+      "Frege",
+      "Jacobi",
+      "Schelling",
+      "Baumgarten",
+      "Reinhold"
+    ],
+    "answer": 0,
+    "explanation": "Frege . matematiksel önermelerin neden oluştuğunu göstermek amacıyla  tasarlanır. Buradan yola çıkarak yapmaya çalıştığı, aritmetiğin dayandığı başlangıç  ilkelerinin, en temel mantık ilkelerinden türetilebileceğini göstermektir."
+  },
+  {
+    "question": "Bununla ilgili diğer bir çabasını aritmetiksel kavramları saf mantıksal terimlerle  tanımlamak oluşturur.\nMatematik felsefesiyle uğraştığı sırada karşılaştığı “sayı nedir?”, “matematiksel  önermelerin yapısı nedir?” gibi questionlar onu dilin mantıksal yapısına yöneltir\nAşağıdakilerden hangisi aritmatik matematiği mantığa indirger?",
+    "options": [
+      "Baumgarten",
+      "Jacobi",
+      "Schelling",
+      "Frege",
+      "Reinhold"
+    ],
+    "answer": 3,
+    "explanation": "BENZER question"
+  },
+  {
+    "question": "Frege . matematiksel önermelerin neden oluştuğunu göstermek amacıyla  tasarlanır. Buradan yola çıkarak yapmaya çalıştığı, aritmetiğin dayandığı başlangıç  ilkelerinin, en temel mantık ilkelerinden türetilebileceğini göstermektir.\nBununla ilgili diğer bir çabasını aritmetiksel kavramları saf mantıksal terimlerle  tanımlamak oluşturur.\nFrege’nin felsefesinde küme paradoksunu kim bulmuştur ? BÜT-2015, FİNAL-2016",
+    "options": [
+      "Peano",
+      "Russell",
+      "Peirce",
+      "Carnap",
+      "Wittgenstein"
+    ],
+    "answer": 1,
+    "explanation": "Aritmetiği mantığa indirgeme çabası bakımından Frege ile benzer düşünen Russell  ondan çok önemli bir noktada ayrılır."
+  },
+  {
+    "question": "Frege sayıları kümelere indirgemiştir.\nRussell burada önemli bir paradoks bulur: küme paradoksu.\nRussell kümeleri iki öbekte toplamaya çalışır:\nKendi kendisinin elemanı olan kümeler ile kendi kendisinin elemanı olmayan  kümeler.\nAşağıdakilerden hangisi analitik felsefeye yönelik bir eleştiri değildir? FİNAL-2016",
+    "options": [
+      "Geleneksel felsefenin temel questionnlarını yok sayma",
+      "Metafiziği dışarıda bırakmak",
+      "Niceliksel düşünme",
+      "Felsefenin bilimsel etkinlikle ilgilisini yalnızca bilimsel sonuçlar üzerinde  konuşmaya indirgemek",
+      "Analitik felsefenin; dil felsefesi, sembolik mantık, mantık felsefesi gibi yeni  alanların ortaya çıkmasına aracılık etmesi"
+    ],
+    "answer": 2,
+    "explanation": "(BENZER question, KONUYU ÇALIŞIN)"
+  },
+  {
+    "question": "Analitik felsefe kapsamında yapılan çalışmalardan biri değildir ? FİNAL-2014",
+    "options": [
+      "Frege’nin niceleme mantığını oluşturması",
+      "Russell ‘ın küme paradoksunu bulması",
+      "Wittgenstein’ın dil ve mantıkla ilgili çalışmaları",
+      "Viyana Çevresi’nin felsefenin metafizikten arındırılma çalışmaları",
+      "Hegel’in diyalektik çalışmaları"
+    ],
+    "answer": 4,
+    "explanation": "( Şıklar sonradan eklendi. Konuyu çalışın.)"
+  },
+  {
+    "question": "Mantıksal Atomculuk aşağıdakilerden hangi filozofa ait bir kavramdır?",
+    "options": [
+      "Wittgenstein",
+      "Russell",
+      "Brahe",
+      "Holbach",
+      "Voltaire"
+    ],
+    "answer": 1,
+    "explanation": "Russell, metafiziksel questionnları dilin mantıksal yapısının yanlış anlaşılmasına bağlar.  Dilbilgisi üzerine yapılacak çalışmalar aracılığıyla felsefenin questionnlardan  arındırılabileceğini savunur. Bu öğretisine mantıksal atomculuk adı verilir."
+  },
+  {
+    "question": "Analitik felsefenin başlangıç tarihi nedir?",
+    "options": [
+      "18 yy",
+      "20 yy",
+      "17 yy",
+      "Antik çağ",
+      "16 yy"
+    ],
+    "answer": 1,
+    "explanation": "20. yüzyılda ortaya çıkan analitik felsefe"
+  },
+  {
+    "question": "Analitik felsefe 19. yüzyılda başlayıp 20. yüzyılda gelişen bir felsefe yapma  biçimidir.\nAşağıdakilerden hangisi mantıksal atomculuğu geliştirmiştir?",
+    "options": [
+      "Sartre",
+      "Kant",
+      "Wittgenstein",
+      "Descartes",
+      "Husserl"
+    ],
+    "answer": 2,
+    "explanation": "Russell’ın öğrencisi olan Wittgenstein."
+  },
+  {
+    "question": "Görüşleri kimi temel benzerlikler bulunmakla birlikte iki ayrı dönemde ele alınır.  İlk döneminde mantıksal atomculuk öğretisini geliştirir.\nAşağıdakilerden hangisi Frege felsefesinde önemli yer tutan iki kavram çiftidir?",
+    "options": [
+      "Erek - Rastlantı",
+      "Töz - İlinek",
+      "Görünüş - Gerçek",
+      "Anlam - Gönderim",
+      "Mekanik - Organik"
+    ],
+    "answer": 3,
+    "explanation": "Anlam - Gönderim"
+  },
+  {
+    "question": "Mantıksal atomculuk öğretisi kime aittir? FİNAL-2019",
+    "options": [
+      "Boole",
+      "Jevons",
+      "Frege",
+      "Peirce",
+      "Russell"
+    ],
+    "answer": 4,
+    "explanation": "Russell, metafiziksel questionnları dilin mantıksal yapısının yanlış anlaşılmasına bağlar.  Dilbilgisi üzerine yapılacak çalışmalar aracılığıyla felsefenin questionnlardan  arındırılabileceğini savunur. Bu öğretisine mantıksal atomculuk adı verilir."
+  },
+  {
+    "question": "Aşağıdakilerden hangisi analitik felsefe-metafizik ilişkisini anlatır?",
+    "options": [
+      "metafiziği felsefenin amacı saymak",
+      "metafiziği derinleştirmek",
+      "metafiziği felsefenin temel disiplini durumuna getirmek",
+      "metafiziği elemek",
+      "metafiziği ilk felsefe saymak"
+    ],
+    "answer": 3,
+    "explanation": "metafiziği elemek"
+  },
+  {
+    "question": "Comte’a göre Batı düşüncesinin son evresi nedir? FİNAL-2015,BÜT-2015,BÜT-2016",
+    "options": [
+      "Metafizik",
+      "Teolojik",
+      "Olguculuk",
+      "Rasyonellik",
+      "Dinsellik"
+    ],
+    "answer": 2,
+    "explanation": "Batıda bu düşünüş başlıca üç evreden geçmiştir:"
+  },
+  {
+    "question": "1. Birinci evre, teolojik evredir. Bu dönemde evren dinî görüşlerle açıklanmaya  çalışılır.\n2. İkinci evre olan metafizik evrede ise felsefi kavramlarla söz gelimi töz,  ereksellik, varlık, oluş vb. evren açıklanmak istenir.\n3. Üçüncü evre olgucu (pozitif) düşünme evresidir.\nAşağıdakilerden hangisi Viyana camiası filozoflarından değildir? FİNAL-2016",
+    "options": [
+      "Moritz Schlick",
+      "Rudolf Carnap",
+      "Kant",
+      "Gustav Bergmann",
+      "Kurt Gödel"
+    ],
+    "answer": 2,
+    "explanation": "Viyana Çevresi olarak bilinen bu grubun önderi Moritz Schlick’tir.  Moritz Schlick fizik felsefesi üzerine çalışmalar yapar."
+  },
+  {
+    "question": "Ondan sonra etkili kişi Rudolf Carnap’tır.\nBunun yanı sıra çağının politik isimlerinden biri olan Otto Neurath da çevrenin  üyesidir.\nÇevrenin diğer üyeleri şunlardır:\n-Gustav Bergmann, Herbert Feigl, Philipp Frank,\n-Kurt Gödel, Hans Hahn, Victor Kraft,\n-Karl Menger, Marcel Natkin, Olga Hahn-Neurath,\n-Theodor Radakovic, Friedrich Waismann.\nAşağıdakilerden hangisi Viyana camiası filozoflarından değildir? FİNAL-2014",
+    "options": [
+      "Schlick",
+      "Carnap",
+      "Bergmann",
+      "Neurath",
+      "Heidegger"
+    ],
+    "answer": 4,
+    "explanation": "Viyana Çevresi olarak bilinen bu grubun önderi Moritz Schlick’tir.  Moritz Schlick fizik felsefesi üzerine çalışmalar yapar."
+  },
+  {
+    "question": "Ondan sonra etkili kişi Rudolf Carnap’tır.\nBunun yanı sıra çağının politik isimlerinden biri olan Otto Neurath da çevrenin  üyesidir.\nÇevrenin diğer üyeleri şunlardır:\n-Gustav Bergmann, Herbert Feigl, Philipp Frank,\n-Kurt Gödel, Hans Hahn, Victor Kraft,\n-Karl Menger, Marcel Natkin, Olga Hahn-Neurath,\n-Theodor Radakovic, Friedrich Waismann.\nViyana çevresine göre metafizik olanın niteliği nedir? FİNAL-2016",
+    "options": [
+      "Anlamlı",
+      "Özdeş",
+      "Çelişik",
+      "Anlamsız",
+      "Gerekli"
+    ],
+    "answer": 3,
+    "explanation": "Viyana Çevresi düşünürlerinin felsefe anlayışı uyarınca bilim ve sağduyunun  gösterdiği dışında bir dünya bulunmaz."
+  },
+  {
+    "question": "Açıktır ki böylesi bir felsefi tutum metafiziği dışta tutar.\nHerhangi bir önerme eğer biçimsel bir önerme (mantık ve matematiğin içinde bir  önerme) değilse veya deneyle denetlenemezse anlamsızdır. Öyleyse mantıksal  olguculara göre metafizik önermeler anlamsızdır.\nViyana felsefesi mantığı neye dayandırır? FİNAL-2015, BÜT-2015, BÜT-2016",
+    "options": [
+      "Gözlem ifadeleri",
+      "Metafiziğe",
+      "Öngörülere",
+      "Önerme olmasına",
+      "Deneyden bağımsız olmasına"
+    ],
+    "answer": 0,
+    "explanation": "Mantıksal olguculuğun en temel önermesi Schlick aracılığıyla ortaya konulan “bir  önermenin anlamı onun doğrulama yöntemidir” ifadesidir. Bu önerme ilk elden  şunu demektedir:"
+  },
+  {
+    "question": "Deney ve gözlem yoluyla doğrulanmayan her şey anlamsızdır.\nİkinci olarak ise bir önermenin anlamını, bu önermeyi neyin doğrulayacağını  belirleyerek betimlenebilir olmayı gerektirdiğini söyler.\nBöylece tüm önermeler gözleme indirgenir.\nHangisi Viyana Çevresi’nin felsefeye yüklediği ödevlerden biridir? FİNAL-2014",
+    "options": [
+      "Bilimsel keşifler yapmak",
+      "İnsanın dünyadaki yerini bilme",
+      "Bilimlere metafiziği anlatma",
+      "Varlığın kökenini araştırmak",
+      "Görünmeyenler hakkında araştırma yapmak"
+    ],
+    "answer": 0,
+    "explanation": "Bu questionnun şıkları yanlış görünmektedir. Ben yine de en yakın olan şıkı  işaretledim. Sınavda çıkarsa iptalini talep ederiz."
+  },
+  {
+    "question": "Hangisi Viyana çevresinin klasik felsefeye bakışını niteler? FİNAL-2014",
+    "options": [
+      "Özcü evren anlayışı",
+      "Doğa bilimleri önermeleri",
+      "Niceleme mantığı",
+      "Analitik felsefe",
+      "Dil bilimi"
+    ],
+    "answer": 0,
+    "explanation": "Özcü evren anlayışı"
+  },
+  {
+    "question": "NOT: Klasik felsefe denildiğinde modern felsefe öncesi felsefe kastedilir\nAşağıdakilerden hangisi Viyana Çevresi’nin felsefeye bakışını niteler? (A) Özcü evren anlayışı\n(B) Bilimsel dünya görüşü\n(C) Matematiksel doğa kavrayışı\n(D) Metafiziği temellendirme\n(E) Erekselcilik\nanswer:  B\nBilimsel dünya görüşü\nNOT: Bu questiondaki felsefe ise modern felsefe\nViyana Çevresi’nin etkisi ile ortaya çıkan felsefeye bakış açılarından hangisi doğru  değildir? FİNAL-2014 (BENZER question)",
+    "options": [
+      "Felsefe, Bilimin dili üzerine konuşmak ve bilimin mantığını ortaya koymaya  çalışmaktır.",
+      "Felsefe, dili kullanmanın questionşturulması, gerçekte insanlar tarafından yaşandığı  biçimiyle dünyanın yapısına yönelik questionşturmadır.",
+      "Felsefeye düşen bilimin kavramlarını çözümlemek ve eleştirmektir.",
+      "Felsefe, metafizik kavramları çözümlemeli ve kanıtlamalıdır.",
+      "Felsefenin görevi, bilim insanlarının kullandığı kavramları, sözgelimi olasılık,  zaman ve uzay vb. daha kesinleştirerek bilime hizmet etmektir."
+    ],
+    "answer": 3,
+    "explanation": "-mantıksal olgucular için felsefe, bilimin dili üzerine konuşmakta ve bilimin  mantığını ortaya koymaya çalışmaktadır."
+  },
+  {
+    "question": "-dili kullanmanın questionşturulması gerçekte insanlar tarafından yaşandığı gibi  dünyanın yapısının questionşturulmalıdır.\n-Felsefenin yapacağı bilimin kavramlarını çözümlemek ve eleştirmektir.\n-Viyana Çevresinin etkisiyle felsefeciler yapacakları işin yalnızca ve  alçakgönüllülükle bilim insanlarını izlemek ve yapmak istedikleri şeyi açıklamak  değil; kullandığı kavramları olasılık, zaman ve uzaya ilişkin kavramlar gibi daha  kesinleştirerek bilime hizmet etmek olduğunu gördüler.\nAşağıdakilerden hangisi Viyana Çevresi'nin felsefi anlayışının adıdır?",
+    "options": [
+      "Sezgicilik",
+      "Mantıksal atomculuk",
+      "Transendental felsefe",
+      "Mantıksal olguculuk",
+      "Duyumculuk"
+    ],
+    "answer": 3,
+    "explanation": "Olguculuktan yaklaşık bir yüzyıl sonra ortaya çıkan mantıksal olguculuk, 1922’de  Viyana Üniversitesi’nde kurulmuş olan Ernest Mach Topluluğu’nda bir grup bilim  insanının bir araya gelerek bilimsel ve questionnları tartışmasıyla başlar."
+  },
+  {
+    "question": "Aşağıdakilerden hangisi olguculuğun Fransa'daki ilk isimlerinden biridir?",
+    "options": [
+      "Comte",
+      "Descartes",
+      "Leibniz",
+      "Baumgarten",
+      "Kant"
+    ],
+    "answer": 0,
+    "explanation": "Olguculuğun Fransa’da başlıca temsilcisi Auguste Comte"
+  },
+  {
+    "question": "İngiltere’de John Stuart Mill ve Herbert Spencer’dir\nAşağıdakilerden hangisi Viyana Çevresi açısından bilginin kaynağıdır?",
+    "options": [
+      "Akıl",
+      "İnanç",
+      "Sezgi",
+      "Deneyim",
+      "İmgelem"
+    ],
+    "answer": 3,
+    "explanation": "Viyana Çevresinin felsefe anlayışı iki yaklaşım üzerine kuruludur: 1. Deneyim bilginin biricik kaynağıdır."
+  },
+  {
+    "question": "2. Sembolik mantık aracılığıyla yürütülen mantıksal çözümleme, felsefe  questionnlarını çözmenin yöntemidir. Modern sembolik mantığın kapsamlı kullanılışı,  mantıksal olguculuğu diğer olgucu anlayışlardan ayırır.\nAşağıdakilerden hangisi viyana çevresine göre metafiziksel olanı niteler?",
+    "options": [
+      "anlamsız olma",
+      "anlamlı olma",
+      "kökensel olma",
+      "ereksel olma",
+      "özsel olma"
+    ],
+    "answer": 0,
+    "explanation": "Viyana Çevresi için metafizik olan bir şey anlamsız, anlamsız olan bir şey ise metafiziktir."
+  },
+  {
+    "question": "Aşağıdakilerden hangisi felsefeyi bir öğreti değil etkinlik olarak görür?",
+    "options": [
+      "Sartre",
+      "Descartes",
+      "Husserl",
+      "kant",
+      "Wittgenstein"
+    ],
+    "answer": 4,
+    "explanation": "10. ÜNİTE"
+  },
+  {
+    "question": "Bir başka analitikçi Russell’ın öğrencisi olan Wittgenstein’dır.\nGörüşleri kimi temel benzerlikler bulunmakla birlikte iki ayrı dönemde ele alınır.  İlk döneminde mantıksal atomculuk öğretisini geliştirir. Felsefeyi bir öğreti olarak  değil etkinlik olarak ele alır.\nAşağıdakilerden hangisi Viyana Çevresi’nin felsefeye yüklediği ödevlerden biridir?",
+    "options": [
+      "Matematik problemleri çözmek",
+      "Düşüncelerin mantıksal analizini yapmak",
+      "İnsanın dünyadaki yerini belirlemek",
+      "Fiziksel gerçekliği araştırmak",
+      "Tin’in hareketini araştırmak"
+    ],
+    "answer": 1,
+    "explanation": "Düşüncelerin mantıksal analizini yapmak"
+  },
+  {
+    "question": "Husserl fenomolojisinin esin kaynağı nedir? FİNAL-2015, BÜT-2015, BÜT-2016",
+    "options": [
+      "Felsefe",
+      "Matematik",
+      "Mantık",
+      "Din",
+      "Metafizik"
+    ],
+    "answer": 1,
+    "explanation": "Husserl, fenomenolojiyi kurarken matematik bilimleri göz önünde bulundurur.  Matematik nasıl beş tane nesneden beşliği sıyırıyorsa fenomenoloji de bir  nesnenin özünü real yanından ayırıp araştıracaktır."
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Husserlci Fenomoloji açısından saf bilinçteki fenomenin  özünü kavramayı sağlar? FİNAL-2016",
+    "options": [
+      "Bilinç",
+      "Zihin",
+      "Saf görü",
+      "Akıl",
+      "Üst bilinç"
+    ],
+    "answer": 2,
+    "explanation": "Saf görü"
+  },
+  {
+    "question": "Hangisi Husserlci Fenomolojinin ayraca alma ile araştırdığı alandır? FİNAL-2016",
+    "options": [
+      "Saf bilinç",
+      "Görü",
+      "Zihin",
+      "Göreli alan",
+      "Aşkın alan"
+    ],
+    "answer": 0,
+    "explanation": "Saf bilinç"
+  },
+  {
+    "question": "Fenomolojide ayracın içinde kalan hangisidir? FİNAL-2015, BÜT-2015, BÜT-2016",
+    "options": [
+      "Özleri",
+      "Felsefe",
+      "Bilim",
+      "Din",
+      "Gündelik yaşam"
+    ],
+    "answer": 0,
+    "explanation": "Özleri"
+  },
+  {
+    "question": "5. Fenomoloji …….. arındırılmış bilgiye dayandırılmalıdır. Boşluğa ne gelmelidir?  FİNAL-2014",
+    "options": [
+      "Akıldan",
+      "Deneyimden",
+      "Sezgiden",
+      "Hayal gücünden",
+      "Anlamdan"
+    ],
+    "answer": 1,
+    "explanation": "NOT: Bu question muhtemelen sonradan değiştirilmiş olup kuşku şıkı eklenmiştir.  KUŞKUDAN cevabı doğru answer olacaktır. Içinde “kuşkudan” şıkı yoksa deneyim  yaparsınız"
+  },
+  {
+    "question": "Husserlci fenomenoloji ……. arındırılmış bilgiye dayandırılmalıdır.\nYukarıdaki boşluğu en uygun şekilde tamamlayan seçenek aşağıdakilerden  hangisidir?",
+    "options": [
+      "Deneyimden",
+      "Hayalden",
+      "Kuşkudan",
+      "Algıdan",
+      "Eleştiride"
+    ],
+    "answer": 2,
+    "explanation": "Kuşkudan"
+  },
+  {
+    "question": "Hangisi Husserlci fenomonoloji eleştirisidir değil? FİNAL-2014",
+    "options": [
+      "Bilginin yönelinen nesneye uygun düşüp düşmemesi",
+      "Genel geçer bilgileri, onlara uygun reel bir varlık olsun olmasın geçerli düşünür.",
+      "Fenomenoloji hiçbir şeyi varsayarak hareket etmez.",
+      "Kuruntular, hayaller fenomenoloji için en uygun araştırma ortamıdır.",
+      "Fenomenoloji gerçeklikten yararlanmaz."
+    ],
+    "answer": 0,
+    "explanation": "-Husserl ise genel geçer bilgileri, onlara uygun reel bir varlık olsun olmasın geçerli  düşünür."
+  },
+  {
+    "question": "-Fenomenoloji hiçbir şeyi varsayarak hareket etmez\n-Husserl’e göre kuruntular, hayaller fenomenoloji için en uygun araştırma  ortamıdır.\n-Fenomenoloji gerçeklikten yararlanmaz. Bütün gerçekliği kendine özgü indirgeme  yöntemi ile dışarıda bırakır, parantez/ayaç içine alır.\nAşağıdakilerden hangisi Fenomolojideki fenomendir?",
+    "options": [
+      "Saf bilinç",
+      "Görü",
+      "Zihin",
+      "Göreli alan",
+      "Olay"
+    ],
+    "answer": 4,
+    "explanation": "Olay"
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Husserlci Fenomenolojinin özlere ulaşma yöntemlerinden  biridir?",
+    "options": [
+      "Tümdengelim",
+      "Soyutlama",
+      "İndirgeme",
+      "Bölümleme",
+      "Tümevarım"
+    ],
+    "answer": 2,
+    "explanation": "İndirgeme"
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Husserl'e göre Fenomenoloji araştırması için en  uygundur?",
+    "options": [
+      "Deneysel bilgiler",
+      "Olaylar",
+      "Hayaller",
+      "Duyu verileri",
+      "Olgular"
+    ],
+    "answer": 2,
+    "explanation": "Husserl’e göre kuruntular, hayaller fenomenoloji için en uygun araştırma  ortamıdır."
+  },
+  {
+    "question": "‘Fenomenolojik yöntem’ deyişinin içinde geçen ‘fenomen’ yöntemin……….  gösterir. ? FİNAL 2019",
+    "options": [
+      "Bağımsızlığını",
+      "Tarafsızlığını",
+      "İlkelliğini",
+      "Olgunluğunu\nanswer:  B\nBöylesi bir yöntem bize eidetik bir bilim sunar. Yöntemin adında geçen fenomen  yöntemin tarafsızlığını gösterir.\nAşağıdakilerden hangisi Husserlci fenomolojinin temel inceleme konusudur?  a) Felsefe\nb) Mantık\nc) Metafizik\nd) Matematik bilimleri\nanswer:  D\nAşağıdakilerden hangisi husserlci fenomenoloji açısından saf yaşantılar alanının bir  özelliğidir?\na) belirsiz olma\nb) aşkın olma\nc) göreli olma\nd) içkin olma",
+      "değişken olma"
+    ],
+    "answer": 3,
+    "explanation": "Husserl bu alanı, mutlak varlığın kaynağı, saf yaşantıların alanı olarak tanımlar.  Burada artık olay bilgilerinin, tesadüflerin yeri yoktur."
+  },
+  {
+    "question": "Bu alan içkin (immanent) olan bir alandır. Zaten özler, yalnız içkin alanda  aranacaktırlar ve oradadırlar.\nMatematik bilimlerinin hangi özelliği husserlci fenomenolojinin kuruluşunda göz  önüne alınmasının nedenidir?",
+    "options": [
+      "şeylerin özlerine ulaştırabilecek bir yönteme dayanması",
+      "idealara ulaştırması",
+      "teorik bir bilim olması",
+      "bilgiyi temellendirmeyi sağlaması",
+      "aksiyomatik akıl yürütme becerisi kazandırması"
+    ],
+    "answer": 0,
+    "explanation": "şeylerin özlerine ulaştırabilecek bir yönteme dayanması"
+  },
+  {
+    "question": "Varoluşçuluk terimini ilk kullanan kimdir? BÜT-2015,FİNAL-2015, FİNAL-2016",
+    "options": [
+      "Jean Paul Sartre",
+      "Simone de Beauvoir",
+      "Albert Camus",
+      "Karl Jaspers",
+      "Martin Heidegger"
+    ],
+    "answer": 0,
+    "explanation": "Varoluşçuluk terimini ilk kullanan Jean Paul Sartre olmuştur."
+  },
+  {
+    "question": "Varoluşçu felsefenin temel yöntemi hangisidir? BÜT-2015, FİNAL-2016",
+    "options": [
+      "Varlıkla ilgili",
+      "İdealarla ilgili",
+      "Metafizikle ilgili",
+      "Değerlerle ilgili",
+      "Dil kullanımı ile ilgili"
+    ],
+    "answer": 0,
+    "explanation": "Varlıkla ilgili"
+  },
+  {
+    "question": "“Varoluşçuluk Bir İnsancıllıktır.” Adlı eser hangisine aittir? FİNAL-2014",
+    "options": [
+      "Camus",
+      "Kafka",
+      "Sartre",
+      "Heiddegger",
+      "Marcel"
+    ],
+    "answer": 2,
+    "explanation": "-İmgelem, 1936"
+  },
+  {
+    "question": "-Varlık ve Hiçlik, 1943\n-Varoluşculuk Bir İnsancıllıktır, 1946\n-Diyalektik Aklın Eleştirisi, 1960\n-Ben’in Aşkınlığı,1960\nSartre’ın bu eserleri dışında çok sayıda romanı da bulunur.\nBunlardan başlıcaları Bulantı, Duvar, Özgürlük Yolları, Akıl Çağı’dır.\nAşağıdakilerden hangisi Sartre’in varlığına ilişkin bölümlerdendir FİNAL-2014 18",
+    "options": [
+      "İçkin varlık-aşkın varlık",
+      "Kendinde varlık-kendinde olmayan varlık",
+      "Kendinde varlık- kendisi için varlık",
+      "Kendisi olan şey- kendisi dışında şey",
+      "A priori varlık- a posteriori varlık"
+    ],
+    "answer": 2,
+    "explanation": "Sartre’ın metafiziğinde iki tür şey bulunur. Bu şeylerin ayrımı zamansallık  üzerinden yapılır."
+  },
+  {
+    "question": "Sartre, daha sonra kendinde varlık ile kendisi için varlık arasında bir ayrım yapar.\nSartre kendi seçimlerini yapan insanı nasıl tanımlar? FİNAL-2015, BÜT-2015, BÜT 2016",
+    "options": [
+      "Kendisi için varlık",
+      "Kendinde varlık",
+      "Aşkın varlık",
+      "İçkin varlık",
+      "Varlığın özü"
+    ],
+    "answer": 0,
+    "explanation": "Kendisi için varlık durumunda insan zihni kendini var olduğu bir durumda bulur.  Bu durum insanın kendi seçimlerinin ürünüdür."
+  },
+  {
+    "question": "Sartre’den önce gelen düşünürler insanı nasıl tanımlamıştır? FİNAL-2015, BÜT 2015, BÜT-2016",
+    "options": [
+      "Kendisi için varlık",
+      "Kendinde varlık",
+      "Aşkın varlık",
+      "İçkin varlık",
+      "Varlığın özü"
+    ],
+    "answer": 1,
+    "explanation": "Sartre’a göre Descartes gibi pek çok filozof insanı kendinde varlık olarak  görmektedir"
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Varoluşçuluk Felsefesinde Sartre”nin etkilendiği  filozoftur?",
+    "options": [
+      "Kant",
+      "Arnold Tonybee",
+      "Aguste Comte",
+      "Heidegger",
+      "Husserl"
+    ],
+    "answer": 3,
+    "explanation": "Sartre’ın varoluşçuluk anlayışı büyük ölçüde Heidegger etkisinde gelişir"
+  },
+  {
+    "question": "Aşağıdakilerden hangisi varoluşçuluğun temel tezlerinden biridir?",
+    "options": [
+      "İnanmak için anlıyorum.",
+      "Felsefi araştırmanın konusu eyleyen insandır.",
+      "Deneysel olan anlamlıdır.",
+      "Anlamak için inanıyorum.",
+      "Metafizik bilgi ilk bilgidir."
+    ],
+    "answer": 1,
+    "explanation": "Filozofların varoluşçuluğa yaklaşımlarında pek çok fark bulunmasına rağmen,  felsefi araştırmanın konusunu yalnızca düşünen değil çeşitli biçimlerde eyleyen  insana yöneltmiş olmaları ortaktır."
+  },
+  {
+    "question": "Aşağıdakilerden hangisi insanın varoluşunu felsefi bir problem olarak görmez?  FİNAL-2017",
+    "options": [
+      "Sartre",
+      "Camus",
+      "Merleau-Ponty",
+      "Frege",
+      "Heidegger"
+    ],
+    "answer": 3,
+    "explanation": "Varoluşçuluk, insan varoluşunu felsefi bir questionn olarak gören çok sayıda filozofun  çalışmalarını nitelemek için kullanılır."
+  },
+  {
+    "question": "Başlıca temsilcileri olarak\nJean Paul Sartre, Simone de Beauvoir, Maurice Merleau-Ponty,  Albert Camus, Karl Jaspers, Martin Heidegger,\nMartin Buber, Jean Wahl, Gabriel Marcel,\nJosé Ortega y Gasset ve Miguel de Unamuno anılır.\nKendine varlık açısından .... önce gelir, kendisi için varlık açısından .... önce gelir.\nAşağıdakilerden hangisinde boşlukları dolduracak ifadeler sırasıyla doğru olarak  verilmiştir?",
+    "options": [
+      "Öz varoluştan – varoluş özden",
+      "Toplum bireyden-birey toplumdan",
+      "Varoluş özden- öz varoluştan",
+      "Doğa akıldan- akıl doğadan",
+      "İnsan hayvandan- hayvan insandan"
+    ],
+    "answer": 0,
+    "explanation": "Kendine varlık açısından öz varoluştan önce gelir, kendisi için varlık açısından  varoluş özden önce gelir."
+  },
+  {
+    "question": "Postmodern düşünce .......... bir karşı çıkıştır. Boşluğa hangisi gelmelidir? FİNAL 2014",
+    "options": [
+      "Aydınlanmaya",
+      "Modernizme",
+      "Pozitivizme",
+      "Feodalizme",
+      "Kapitalizme"
+    ],
+    "answer": 1,
+    "explanation": "Postmodern düşünce moderne dönük köktenci bir eleştiri olarak ortaya çıkar."
+  },
+  {
+    "question": "Postmodernizm tartışmasını başlatan isim kimdir? BÜT-2015, FİNAL-2016",
+    "options": [
+      "Lyotard",
+      "Sartre",
+      "Kant",
+      "Hegel",
+      "Husserl"
+    ],
+    "answer": 0,
+    "explanation": "Postmodernizm tartışmasını başlatan isim ise Lyotard’dır."
+  },
+  {
+    "question": "Aşağıdakilerden hangisi postmodernizmin aydınlanma bağıntısını anlatır? FİNAL 2016",
+    "options": [
+      "Soyutlama",
+      "İçerme",
+      "Tamamlama",
+      "Karşı çıkma",
+      "Övgü"
+    ],
+    "answer": 3,
+    "explanation": "Postmodernizm, modernizm düşüncesinin temellerine bir darbedir. Aydınlanma  sonrası düşünce akımlarından bir kopuştur."
+  },
+  {
+    "question": "Postmodernizm, Aydınlanma düşüncesiyle gelişen düşüncelere karşı tutum  geliştirir. Bu nedenle doğa biliminin evrensellik iddiasına, araçsal, nesnelleştirici  rasyonalizme karşı çıkar.\nAşağıdakilerden hangisi postmodernizmin özelliklerinden değildir? FİNAL 2015,BÜT-2015,",
+    "options": [
+      "Katılım",
+      "Karnavalcılık",
+      "Her şey uyar",
+      "Mutlağa ulaş",
+      "Geleceğe dönüş"
+    ],
+    "answer": 3,
+    "explanation": "Postmodernin Özellikleri"
+  },
+  {
+    "question": "-Belirsizlik -Parçalanma -Otorite Karşıtlığı\n-Ben’in Derinlik Yitimi -Gösterilebilir Olmama, Betimlenebilir Olmama -İroni -Melezleşme\n-Karnavallaşma -Katılma -Metinsellik\n-Geleceğe dön! -Her şey uyar/olur/gider!\nAşağıdakilerden hangisi postmodernizmin özelliklerinden değildir? BÜT-2016",
+    "options": [
+      "Soyutlama",
+      "Mutlağa ulaş",
+      "Tamamlama",
+      "İçerme",
+      "Övgü"
+    ],
+    "answer": 1,
+    "explanation": "Mutlaga ulaşma"
+  },
+  {
+    "question": "Mutlak kelimesi idealist felsefelerin kavramidir\nModerrnci ve postmodernci düşünürler o kelimeyi kullanmazlar\nAşağıdakilerden hangisi postmodern düşüncenin belirsizlik özelliğine uygundur?",
+    "options": [
+      "Düşüncelerin, eylemlerin belirsiz oluşu",
+      "Sanatçının belirsiz oluşu",
+      "İktidarın belirsiz oluşu",
+      "Kişilerin belirsiz oluşu",
+      "Mekanların belirsiz oluşu"
+    ],
+    "answer": 0,
+    "explanation": "Belirsizlik"
+  },
+  {
+    "question": "e) Marks",
+    "options": [
+      "Duyum",
+      "Algı",
+      "Doğa",
+      "Madde",
+      "Öz-bilinç"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "e) Mantık Bilimi",
+    "options": [
+      "Sermaye",
+      "Para",
+      "Yabancılaşma",
+      "Meta",
+      "Değer"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Marks’a göre toplumsal düzenin bozulmasının nedenidir?",
+    "options": [
+      "İşçiler",
+      "İklim koşulları",
+      "Coğrafi koşullar",
+      "İnsan doğası",
+      "Burjuva mülkiyeti"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Marks’a göre bir toplumun gelişmişlik düzeyinin temel  belirleyicisidir?",
+    "options": [
+      "Üretici güçlerin durumu",
+      "Sıcaklık",
+      "Yağış",
+      "Ülke nüfusu",
+      "Madenler"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdaki hangisi Marks’a göre insanı diğer canlılardan ayıran en önemli şeydir?",
+    "options": [
+      "Dil",
+      "Vicdan",
+      "Emek",
+      "Yetenek",
+      "Aile"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi görüşlerinin olgunlaşması bakımından Marks’a diğerlerine  göre daha az katkı yapmış olabilir?",
+    "options": [
+      "Feuerbach",
+      "Hegel",
+      "Ricardo",
+      "Locke",
+      "Smith"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "Marks’ın gelişmesinde önemli ölçüde etkili olmuş filozof kimdir?",
+    "options": [
+      "Feuerbach",
+      "Hegel",
+      "Ricardo",
+      "Locke",
+      "Smith"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "“İnsanların varlığını belirleyen şey onların bilinci değil; tersine onların …, bilincini  belirleyen şeydir.”",
+    "options": [
+      "toplumsal varlığı",
+      "aklı",
+      "anlama yetisi",
+      "duyarlığı",
+      "koşulları"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "“… özü devinim olan maddenin zorunlu gelişme yasalarına karşılık gelir.”",
+    "options": [
+      "Düşünme",
+      "Diyalektik",
+      "Yargı",
+      "Önerme",
+      "Form"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "“Marks’ta …, insanın ürettiğinin, kendisinden bağımsızlaşarak kendi karşına  dikilmesidir.”",
+    "options": [
+      "varoluş",
+      "madde",
+      "zaman",
+      "yabancılaşma",
+      "konum"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "“Yabancılaşmış emek durumunda işçi ne kadar çok değer yaratırsa, o kadar çok …”",
+    "options": [
+      "tüketir.",
+      "umutlanır.",
+      "kazanır.",
+      "yavaşlar.",
+      "değersizleşir"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "“Analitik felsefe adı verilen felsefi ekolde birbirleriyle zaman zaman çelişen farklı  yaklaşımlar görülebilir. Bu farklı yaklaşımlara rağmen felsefi problemlere ….  çözümlemesi yaparak çözüm aramak hemen hemen hepsinde ortaktır.”",
+    "options": [
+      "Dil",
+      "Akıl",
+      "Düşünce",
+      "Varlık",
+      "Arkhe"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi analitik felsefe anlayışının ortaya çıkışındaki  tartışmalardan biridir?",
+    "options": [
+      "Hayatın anlamı",
+      "Aritmetiğin temelleri",
+      "Varlığın anlamı",
+      "Arkhe questionnu",
+      "Ahlak problemleri"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi analitik felsefe anlayışının temel yaklaşımı olarak  nitelenebilir?",
+    "options": [
+      "Hoşgörü",
+      "Birlik",
+      "Dizgesel yapılar",
+      "Eleştiri",
+      "Metafizik tutum"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi analitik felsefe anlayışı açısından tartışılan questionnlardan  biri olamaz?",
+    "options": [
+      "Dilin yapısı",
+      "Temel önermeler",
+      "Mantık",
+      "Dünyanın yapısı",
+      "İnsanın ödevi"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi analitik felsefe anlayışına göre sahte bir felsefe  questionnudur?",
+    "options": [
+      "İnsanın özü",
+      "Mantığın yapısı",
+      "Dil-dünya ilişkisi",
+      "Bilimin yapısı",
+      "Anlam"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": ":",
+    "options": [
+      "insanın, varlığın",
+      "dilin, geleneksel metafizik",
+      "canlıların, varoluş",
+      "makinelerin, yapay zeka",
+      "özgürlüğün, otonominin"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "“Frege bir sözcükte …, … ve … birbirinden ayırır.”",
+    "options": [
+      "gösterge, gösteren, gösterileni",
+      "algılayan, kavrayan, düşüneni",
+      "zaman, uzam, yeri",
+      "anlam, gönderim, tasarımı",
+      "söyleyen, yazan, okuyanı"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "“Dilbilgisi üzerine yapılacak çalışmalar aracılığıyla felsefenin questionnlardan  arındırılabileceğini savunur. Bu öğretisine … adı verilir.”",
+    "options": [
+      "deneycilik",
+      "yapısalcılık",
+      "görüselcilik",
+      "akılcılık",
+      "mantıksal atomculuk"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "“Wittgenstein’a göre düşünmek … aracılığıyla olur.”",
+    "options": [
+      "akıl",
+      "zeka",
+      "dil",
+      "çevre",
+      "zaman"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "“Anlamlı bir önerme …resmeder.”",
+    "options": [
+      "düşüncelerin dile getirilişini",
+      "akılsal düşünceleri",
+      "olanaklı olgu durumunu",
+      "önermenin biçimini",
+      "duyguları"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "“Bir …, belirli bir yer ve zaman bağlamında kavranılabilen bir şeydir.”",
+    "options": [
+      "olgu",
+      "olay",
+      "nesne",
+      "durum",
+      "düşünce"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "“Viyana Çevresi dil çözümlemesi yardımıyla tutarlı bir … kurmak ister.”",
+    "options": [
+      "felsefe",
+      "mantık",
+      "matematik",
+      "gösterim bilimi",
+      "düşünce"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "“Metafizik questionnların hiçbir … yoktur.”",
+    "options": [
+      "önemi",
+      "anlamı",
+      "yeri",
+      "değeri",
+      "düşünümü"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Viyana Çevresi filozoflarından biri değildir?",
+    "options": [
+      "Moritz Schlick",
+      "Rudolf Carnap",
+      "Martin Heidegger",
+      "Otto Neurath",
+      "Kurt Gödel"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Viyana Çevresi açısından bir önermenin anlamlı olmasını  sağlar?",
+    "options": [
+      "Uzlaşımsal olması.",
+      "Sağ duyuya uygun olması.",
+      "Deneyle denetlenebilir olması.",
+      "Metafizik temelleri olması.",
+      "Herkesçe anlaşılabilir olması."
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakiler filozoflardan hangisi düşünceleriyle Viyana Çevresi’nin bir araya  gelmesine etki etmiştir?",
+    "options": [
+      "Hegel",
+      "Marks",
+      "Kant",
+      "Mach",
+      "Descartes"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Viyana Çevresi’nin felsefeye bakışını niteler?",
+    "options": [
+      "Özcü evren anlayışı",
+      "Bilimsel dünya görüşü",
+      "Matematiksel doğa kavrayışı",
+      "Metafiziği temellendirme",
+      "Erekselcilik"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Viyana Çevresi’nin felsefeye yüklediği ödevlerden biridir?",
+    "options": [
+      "Matematik problemleri çözmek",
+      "Düşüncelerin mantıksal analizini yapmak",
+      "İnsanın dünyadaki yerini belirlemek",
+      "Fiziksel gerçekliği araştırmak",
+      "Tin’in hareketini araştırmak"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "“... kapsamlı kullanılışı, mantıksal olguculuğu diğer olgucu anlayışlardan ayırır.”",
+    "options": [
+      "Modern sembolik mantığın",
+      "Düşüncenin",
+      "Çevrenin",
+      "Matematiksel denklemlerin",
+      "Klasik mantığın"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "“Bir önermenin anlamı onun … yöntemidir.”",
+    "options": [
+      "hesaplama",
+      "question sorma",
+      "answerlama",
+      "yanlışlama",
+      "doğrulama"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "Fenomenolojinin amacı bilgi ve bilgi nesnesinin karşılıklı ilişkisinde ortaya çıkan  questionnları çözmek, bilinebilir nesnenin … anlamını ortaya koymaktır.",
+    "options": [
+      "Metafizik",
+      "Özsel",
+      "Bilgi kuramsal",
+      "Ontoloji",
+      "Derin"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi fenomenolojinin gerçekliğe uyguladığı yöntemdir?",
+    "options": [
+      "Soyutlama",
+      "Tümevarma",
+      "Tümdengelme",
+      "Paranteze alma",
+      "Türetme"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "Husserlci fenomenoloji ……. arındırılmış bilgiye dayandırılmalıdır.",
+    "options": [
+      "Deneyimden",
+      "Hayalden",
+      "Kuşkudan",
+      "Algıdan",
+      "Eleştiriden"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi fenomenolojik yöntemde bir şeyin bilincine ulaşmayı  sağlar?",
+    "options": [
+      "Saçmaya indirgeme",
+      "Geri çıkarım",
+      "Soyutlama",
+      "Eleştiri",
+      "Yönelimsellik"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "e) indirgeme yöntemi",
+    "options": [
+      "paranteze alma",
+      "realitesinden soymak",
+      "dışarıda bırakma",
+      "harekete geçme",
+      "yargıdan kaçınma"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi varoluşçu bir filozof değildir?",
+    "options": [
+      "Jean-Paul Sartre",
+      "Simone de Beauvoir",
+      "Albert Camus",
+      "Rudolf Carnap",
+      "Frantz Fanon"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "“Varoluşçu filozoflar … bu dünyanın en önde gelen questionnu olarak görür.”",
+    "options": [
+      "eşitsizliği",
+      "adaletsizliği",
+      "metafizik özneyi",
+      "doğa yıkımını",
+      "var olmayı"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi varoluşçu filozofların felsefi araştırmalarını yürüttükleri  temeldir?",
+    "options": [
+      "Doğanın metafizik temelleri",
+      "İnsan-doğa karşıtlığı",
+      "Var olmanın anlamı",
+      "Ahlak ilkeleri",
+      "Ahlakın ontoloji zemini"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden filozoflardan hangisi ‘Varoluşçuluk Bir İnsancıllık Mı?’ adlı eserinin  yazarıdır?",
+    "options": [
+      "Karl Jaspers",
+      "Soren Kierkegaard",
+      "Spinoza",
+      "Jean-Paul Sartre",
+      "Simone de Beauvoir"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Sartre’ın varlığa ilişkin yaptığı bölümlemedir?",
+    "options": [
+      "kendinde-kendisi için",
+      "kendinde-kendine rağmen",
+      "kendinde-kendi dışında",
+      "kendi içinde-kendisi dışında",
+      "kendi kendine-kendi kendisinin ötesinde"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi Sartre’ın yapıtı değildir?",
+    "options": [
+      "Varlık ve Zaman",
+      "İmgelem",
+      "Varlık ve Hiçlik",
+      "Diyalektik Aklın Eleştirisi",
+      "Ben’in Aşkınlığı"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "“Kendinde varlık (être-en-soi) ile kendisi için varlık(être-pour-soi) arasındaki ayrım  … üzerinden yapılır.”",
+    "options": [
+      "konumluluk",
+      "uzamsallık",
+      "zamansallık",
+      "sonluluk",
+      "sonsuzluk"
+    ],
+    "answer": 2,
+    "explanation": ""
+  },
+  {
+    "question": "“Kendisi için varlık için… önce gelir.”",
+    "options": [
+      "öz varoluştan",
+      "varoluş özden",
+      "uzam zamandan",
+      "zaman uzamdan",
+      "sonsuzluk sonluluktan"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "Sartre açısından en kökensel erek aşağıdakilerden hangisinde verilmiştir?",
+    "options": [
+      "Geleceği düşünmeme",
+      "Hayatı yaşama",
+      "Matematiği anlama",
+      "Doğayı anlama",
+      "Kendini yaşama"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "“Zihin bir bilinçtir fakat bu bilinç bir …”",
+    "options": [
+      "hiçliktir",
+      "bütünlük",
+      "varlıktır",
+      "tözdür",
+      "ilinektir"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi modern dönem filozofu değildir?",
+    "options": [
+      "Kant",
+      "Hegel",
+      "Locke",
+      "Platon",
+      "Hume"
+    ],
+    "answer": 3,
+    "explanation": ""
+  },
+  {
+    "question": "Aşağıdakilerden hangisi postmodernizm tartışmasını başlatan isim olarak görülür?",
+    "options": [
+      "Platon",
+      "Locke",
+      "Boethius",
+      "Spinoza",
+      "Lyotard"
+    ],
+    "answer": 4,
+    "explanation": ""
+  },
+  {
+    "question": "e) yeni hastalıklar",
+    "options": [
+      "Postmodernizmde",
+      "Yapısalcılıkta",
+      "Görüselcilikte",
+      "Dışavurumculukta",
+      "Deneycilikte"
+    ],
+    "answer": 0,
+    "explanation": ""
+  },
+  {
+    "question": "“Postmodernizm tartışmasını başlatan … isimli çalışmasıyla Lyotard’dır.”",
+    "options": [
+      "Postmodern Düşünme",
+      "Postmodern Durum",
+      "Postmodern Akıl",
+      "Postmodern Dünya",
+      "Postmodern Yaşantı"
+    ],
+    "answer": 1,
+    "explanation": ""
+  },
+  {
+    "question": "“Postmodern düşünce … dönük köktenci bir eleştiri olarak ortaya çıkar.” Yukarıdaki boşluğu doğru şekilde tamamlayan seçenek aşağıdakilerden hangisidir?",
+    "options": [
+      "antik döneme",
+      "oluşa",
+      "zamana",
+      "moderne",
+      "uzama"
+    ],
+    "answer": 3,
+    "explanation": ""
+  }
+];
+
+
+let aktifquestion = 0;
+let puan = 0;
+let kullanicianswerlar = new Array(questionlar.length).fill(null);
+
+function gosterquestion() {
+  const s = questionlar[aktifquestion];
+  document.getElementById("question-metin").innerText = `question ${aktifquestion + 1}: ${s.question}`;
+
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  s.options.forEach((secenek, i) => {
+    const btn = document.createElement("button");
+    btn.innerText = secenek;
+    btn.onclick = () => answerSec(i);
+    optionsDiv.appendChild(btn);
+  });
+
+  document.getElementById("question-sec").value = aktifquestion;
+  document.getElementById("geri-bildirim").innerText = "";
+}
+
+function answerSec(index) {
+  if (kullanicianswerlar[aktifquestion] !== null) return;
+
+  kullanicianswerlar[aktifquestion] = index;
+  const dogruMu = index === questionlar[aktifquestion].answer;
+  const geri = document.getElementById("geri-bildirim");
+  geri.innerText = dogruMu ? "✅ Doğru!" : `❌ Yanlış! Doğru answer: ${questionlar[aktifquestion].options[questionlar[aktifquestion].answer]}`;
+  if (dogruMu) puan++;
+  document.getElementById("aciklama").innerText = `Açıklama: ${questionlar[aktifquestion].explanation}`;
+}
+
+function answerla() {
+  if (kullanicianswerlar[aktifquestion] === null) {
+    alert("Lütfen bir answer seçin.");
+    return;
+  }
+}
+
+function sonrakiquestion() {
+  if (kullanicianswerlar[aktifquestion] === null) {
+    alert("Lütfen cevabınızı girin.");
+    return;
+  }
+  if (aktifquestion < questionlar.length - 1) {
+    aktifquestion++;
+    gosterquestion();
+  } else {
+    sonucuGoster();
+  }
+}
+
+function questionListesiniDoldur() {
+  const sec = document.getElementById("question-sec");
+  sec.innerHTML = "";
+  for (let i = 0; i < questionlar.length; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.text = `question ${i + 1}`;
+    sec.appendChild(opt);
+  }
+  sec.addEventListener("change", (e) => {
+    aktifquestion = parseInt(e.target.value);
+    gosterquestion();
+  });
+}
+
+function testiBitir() {
+  sonucuGoster();
+}
+
+function sonucuGoster() {
+  document.getElementById("test").style.display = "none";
+  document.getElementById("navigasyon").style.display = "none";
+  document.getElementById("sonuc").innerText = `Toplam ${questionlar.length} questiondan ${puan} doğru answer verdiniz.`;
+  document.getElementById("bastan").style.display = "block";
+}
+
+function bastanBasla() {
+  aktifquestion = 0;
+  puan = 0;
+  kullanicianswerlar = new Array(questionlar.length).fill(null);
+  document.getElementById("test").style.display = "block";
+  document.getElementById("navigasyon").style.display = "block";
+  document.getElementById("sonuc").innerText = "";
+  document.getElementById("bastan").style.display = "none";
+  gosterquestion();
+}
+
+questionListesiniDoldur();
+gosterquestion();
+</script>
+
+</body>
+</html>
